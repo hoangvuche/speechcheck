@@ -1,12 +1,7 @@
 RootWidget:
-    FloatLayout:
-        canvas.before:
-            Color:
-                rgba: 1,0,0,1
-            Rectangle:
-                pos: self.pos
-                size: self.size
+    grd_keywords: grd_keywords
 
+    FloatLayout:
         id: pnl_left
         size_hint: .2, 1
         pos_hint: {'x': 0, 'y': 0}
@@ -14,9 +9,28 @@ RootWidget:
         Button:
             id: btn_add
             text: 'Thêm keyword'
+            font_size: '15sp'
             size_hint: 1, None
             height: self.texture_size[1] + dp(10)
             pos_hint: {'x': 0, 'top': 1}
+
+        ScrollView:
+            canvas.before:
+                Color:
+                    rgba: 1,0,0,1
+                Rectangle:
+                    pos: self.pos
+                    size: self.size
+
+            size_hint: 1, (self.parent.height - btn_add.height) / self.parent.height
+            pos_hint: {'x': 0, 'y': 0}
+            GridLayout:
+                id: grd_keywords
+                cols: 1
+                size_hint_y: None
+                row_force_default: True
+                row_default_height: dp(40)
+
 
     FloatLayout:
         canvas.before:

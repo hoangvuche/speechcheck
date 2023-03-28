@@ -45,6 +45,9 @@ class Keywords:
                 except KeyError:
                     print('Keyword {0} not existed'.format(key.text))
 
+    def refresh(self, view):
+        view.refresh(self._keywords)
+
 
 if __name__ == '__main__':
     key1 = Keyword('key 1')
