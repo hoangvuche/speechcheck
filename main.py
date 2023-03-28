@@ -3,7 +3,7 @@ from os import path
 
 from kivy.app import App
 from kivy.uix.floatlayout import FloatLayout
-from kivy.uix.button import Button
+from kivy.properties import StringProperty
 
 import speech_recognition as sr
 
@@ -34,14 +34,22 @@ class RootWidget(FloatLayout):
 
     def __init__(self, **kwargs):
         super(RootWidget, self).__init__(**kwargs)
-        self.get_db_connection()
 
     def refresh(self, keywords):
         self.grd_keywords.clear_widgets()
         self.grd_keywords.bind(minimum_height=self.grd_keywords.setter('height'))
         for keyword in keywords:
-            btn = Button(text=keyword.text)
-            self.grd_keywords.add_widget(btn)
+            keyitem = KeywordItem(text=keyword.text)
+            self.grd_keywords.add_widget(keyitem)
+
+
+class SpeechQCApp(App):
+
+    def on_start(self):
+        self.get_db_connection()
+        self.keywords = Keywords()
+        controller = QCController(self.keywords, self.root)
+        controller.refresh_keywords()
 
     def get_db_connection(self):
         try:
@@ -54,26 +62,20 @@ class RootWidget(FloatLayout):
             self.con.close()
             print('DB connection closed')
 
-
-class SpeechQCApp(App):
-
-    def on_start(self):
-        self.keywords = self.load_keywords()
-        controller = QCController(self.keywords, self.root)
-        controller.refresh_keywords()
-
-    def load_keywords(self):
-        cursor = self.root.con.cursor()
-        sql = 'select * from keywords'
-        cursor.execute(sql)
-        keys = cursor.fetchall()
-        keywords = []
-        for key in keys:
-            keywords.append(Keyword(key[0]))
-        return Keywords(keywords)
-
     def on_stop(self):
-        self.root.close_db_connection()
+        self.close_db_connection()
+
+
+class KeywordItem(FloatLayout):
+    text = StringProperty('')
+
+    def __init__(self, **kwargs):
+        super().__init__(**kwargs)
+        self.img.bind(on_touch_up=self.cb_on_touch_up)
+
+    def cb_on_touch_up(self, touch, value):
+        if self.img.collide_point(*value.pos):
+            print('touch keyword', self.text)
 
 
 if __name__ == '__main__':

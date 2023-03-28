@@ -17,16 +17,17 @@ RootWidget:
         ScrollView:
             canvas.before:
                 Color:
-                    rgba: 1,0,0,1
+                    rgba: 1,1,1,1
                 Rectangle:
                     pos: self.pos
                     size: self.size
-
             size_hint: 1, (self.parent.height - btn_add.height) / self.parent.height
             pos_hint: {'x': 0, 'y': 0}
+
             GridLayout:
                 id: grd_keywords
                 cols: 1
+                spacing: '1sp'
                 size_hint_y: None
                 row_force_default: True
                 row_default_height: dp(40)
@@ -43,3 +44,27 @@ RootWidget:
         id: pnl_right
         size_hint: .8, 1
         pos_hint: {'y': 0, 'right':1}
+
+
+<KeyWordItem>:
+    img: img
+
+    canvas.before:
+        Color:
+            rgba: .5,.5,.5,1
+        Rectangle:
+            pos: self.pos
+            size: self.size
+    Label:
+        text: root.text
+        text_size: self.size
+        size_hint: 1, 1
+        pos_hint: {'x': 0, 'center_y': .5}
+        halign: 'center'
+        valign: 'middle'
+    Image:
+        id: img
+        source: './images/threedot.png'
+        size_hint: None, None
+        size: dp(24), dp(24)
+        pos_hint: {'x': (root.width - self.width) / root.width, 'center_y': .5}

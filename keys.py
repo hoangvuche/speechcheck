@@ -1,3 +1,5 @@
+from kivy.app import App
+
 class Keyword:
 
     def __init__(self, text=''):
@@ -46,6 +48,15 @@ class Keywords:
                     print('Keyword {0} not existed'.format(key.text))
 
     def refresh(self, view):
+        cursor = App.get_running_app().con.cursor()
+        sql = 'select * from keywords'
+        cursor.execute(sql)
+        keys = cursor.fetchall()
+        keywords = []
+        for key in keys:
+            keywords.append(Keyword(key[0]))
+        self.keywords = keywords
+
         view.refresh(self._keywords)
 
 
