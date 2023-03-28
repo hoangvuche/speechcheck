@@ -1,0 +1,31 @@
+RootWidget:
+    FloatLayout:
+        canvas.before:
+            Color:
+                rgba: 1,0,0,1
+            Rectangle:
+                pos: self.pos
+                size: self.size
+
+        id: pnl_left
+        size_hint: .2, 1
+        pos_hint: {'x': 0, 'y': 0}
+
+        Button:
+            id: btn_add
+            text: 'Thêm keyword'
+            size_hint: 1, None
+            height: self.texture_size[1] + dp(10)
+            pos_hint: {'x': 0, 'top': 1}
+
+    FloatLayout:
+        canvas.before:
+            Color:
+                rgba: 0,1,0,1
+            Rectangle:
+                pos: self.pos
+                size: self.size
+
+        id: pnl_right
+        size_hint: .8, 1
+        pos_hint: {'y': 0, 'right':1}
