@@ -1,0 +1,543 @@
+#: import C kivy.utils.get_color_from_hex
+#: import path os.path
+#: import common common
+#: import Window kivy.core.window.Window
+#: import Clock kivy.clock.Clock
+
+
+<RoundedButton>:
+    background_color: (0,0,0,0)
+    background_normal: ''
+    markup: True
+    text_size: self.size
+    halign: 'center'
+    valign: 'middle'
+    icon_pos_x: self.x + (self.width - 24 * common.scale) / 2 if self.icon_pos_hint == 'center' else (self.x + 24 * common.scale if self.icon_pos_hint == 'left' else ((self.x + self.width - (24 + 24) * common.scale) / self.width if self.text_pos_hint == 'right' else self.x + (self.width - 24 * common.scale) / 2))
+    canvas.before:
+        Color:
+            rgba: root.background_color_display
+        RoundedRectangle:
+            size: self.size
+            pos: self.pos
+            radius: root.radius
+        Color:
+            rgba: 0, 0, 0, int(root.icon_display)
+        Rectangle:
+            source: root.icon
+            size: 24 * common.scale, 24 * common.scale
+            pos: self.icon_pos_x, self.y + (self.height - 24 * common.scale) / 2
+
+
+<RoundedImageButton>:
+
+    icon_pos_x: self.x + (self.width - 24 * common.scale) / 2 if self.icon_pos_hint == 'center' else (self.x + 24 * common.scale if self.icon_pos_hint == 'left' else (self.x + self.width - (24 + 24) * common.scale if self.icon_pos_hint == 'right' else self.x + (self.width - 24 * common.scale) / 2))
+
+    canvas.before:
+        Color:
+            rgba: root.background_color_display
+        RoundedRectangle:
+            size: self.size
+            pos: self.pos
+            radius: root.radius
+    Label:
+        id: lbl
+        text: root.text
+        font_size: root.font_size
+        color: root.color
+        markup: True
+        size_hint: 1, 1
+        text_size: self.size
+        halign: root.halign
+        valign: root.valign
+        padding: root.padding
+        padding_x: root.padding_x
+        padding_y: root.padding_y
+        pos_hint: {'x': 0, 'center_y': .5}
+    Image:
+        source: root.source
+        size_hint: None, None
+        pos: root.icon_pos_x, root.y + (root.height - 24 * common.scale) / 2
+        size: dp(24), dp(24)
+
+
+<BorderedButton>:
+    background_color: (0,0,0,0)
+    background_normal: ''
+    markup: True
+    canvas.before:
+        Color:
+            rgba: root.background_color_border
+        RoundedRectangle:
+            size: self.size
+            pos: self.pos
+            radius: root.radius
+
+        Color:
+            rgba: root.background_color_display
+        RoundedRectangle:
+            size: self.width - root.border_width * 2, self.height - root.border_width * 2
+            pos: self.x + root.border_width, self.y + root.border_width
+            radius: root.radius
+
+
+<DropDownButton>:
+    img: img
+
+    BorderedButton:
+        size_hint: 1, 1
+        pos_hint: {'x': 0, 'y': 0}
+        text: root.text
+        font_size: root.font_size
+        background_color_display: root.background_color_display
+        radius: root.radius
+        border_width: root.border_width
+    Image:
+        id: img
+        size_hint: None, .5
+        width: 24 * common.scale
+        pos_hint: {'right': (root.width - common.element_sep * common.scale) / root.width, 'center_y': .5}
+        source: common.get_image_path('dropdownicon.png')
+
+
+<RoundedTextInput>:
+    font_size: root.font_size
+    background_color: 0,0,0,0
+    cursor_color: root.cursor_color
+    padding_x: root.padding_x
+    padding_y: root.padding_y
+    keyboard_mode: 'managed'
+
+    canvas.before:
+        Color:
+            rgba: root.foreground_color
+    canvas.after:
+        Color:
+            rgba: root.border_color
+        Line:
+            rounded_rectangle: self.x, self.y, self.width, self.height, root.radius
+            width: root.border_width
+
+        Color:
+            rgba: 1, 1, 1, int(root.header_image_display)
+        Rectangle:
+            source: root.header_image if len(self.header_image) else common.get_image_path('magnifier.png')
+            size: 24 * common.scale, 24 * common.scale
+            pos: self.x + common.element_sep * common.scale, self.y + (self.height - 24 * common.scale) / 2
+
+        Color:
+            rgba: 1, 1, 1, int(root.delete_display)
+        Rectangle:
+            source: common.get_image_path('delete.png')
+            size: 24 * common.scale, 24 * common.scale
+            pos: self.x + self.width - 24 * common.scale - common.element_sep * common.scale, self.y + (self.height - 24 * common.scale) / 2
+
+
+<BackgroundOneLineRoundedTextInput>:
+    txt: txt
+    search_magnifier: search_magnifier
+
+    canvas.before:
+        Color:
+            rgba: root.background_color
+        RoundedRectangle:
+            size: self.size
+            pos: self.pos
+            radius: [root.radius,]
+
+    RoundedTextInput:
+        id: txt
+        hint_text: root.hint_text
+        text: root.text
+        write_tab: False
+        multiline: False
+        size_hint: 1, 1
+        font_size: root.font_size
+        font_name: root.font_name
+        font_family: root.font_family
+        pos_hint: {'x': 0, 'y': 0}
+        padding_y: (self.height - self.line_height ) / 2, (self.height - self.line_height ) / 2
+        padding_x: max((24 + common.element_sep * 2) * common.scale, root.padding_x[0]) if root.header_image_display else root.padding_x[0], max((24 + common.element_sep * 3) * common.scale, root.padding_x[1]) if self.delete_display else root.padding_x[1]
+        on_focus: root.on_txt_focus(self, self.focus)
+        radius: root.radius
+        border_width: root.border_width
+        border_color: root.border_color
+        foreground_color: root.foreground_color if len(self.text) else C('#8e8e93')
+        use_bubble: False
+        delete_display: root.delete_display
+        header_image_display: root.header_image_display
+        focus: root.focus
+        halign: root.halign
+        on_text:
+            root.on_txt_text(self, self.text)
+        on_delete:
+            root.on_txt_delete(self)
+    Image:
+        id: search_magnifier
+        source: common.get_image_path('magnifier.png')
+        size_hint: None, None
+        size: 24 * common.scale, 24 * common.scale
+        pos_hint: {'x': (common.element_sep * common.scale) / root.width, 'center_y': .5}
+        opacity: root.magnifier_opacity
+
+
+<BackgroundMultilineRoundedTextInput>:
+    txt: txt
+
+    canvas.before:
+        Color:
+            rgba: root.background_color
+        RoundedRectangle:
+            size: self.size
+            pos: self.pos
+            radius: [root.radius,]
+
+    RoundedTextInput:
+        id: txt
+        hint_text: root.hint_text
+        text: root.text
+        size_hint: 1, 1
+        font_size: root.font_size
+        font_name: root.font_name
+        font_family: root.font_family
+        pos_hint: {'x': 0, 'y': 0}
+        padding_y: root.padding_y
+        padding_x: max(24 + common.element_sep * 2 * common.scale, root.padding_x[0]) if root.header_image_display else root.padding_x[0], max(24 + common.element_sep * 3 * common.scale, root.padding_x[1]) if self.delete_display else root.padding_x[1]
+        on_focus: root.on_txt_focus(self, self.focus)
+        radius: root.radius
+        border_width: root.border_width
+        border_color: root.border_color
+        foreground_color: root.foreground_color if len(self.text) else C('#787A91')
+        use_bubble: False
+        delete_display: root.delete_display
+        header_image_display: root.header_image_display
+        focus: root.focus
+        halign: root.halign
+        on_text:
+            root.on_txt_text(self, self.text)
+
+
+<BackgroundFloatInput>:
+    txt: txt
+
+    canvas.before:
+        Color:
+            rgba: root.background_color
+        RoundedRectangle:
+            size: self.size
+            pos: self.pos
+            radius: [root.radius,]
+
+    NumberRoundedTextInput:
+        id: txt
+        hint_text: root.hint_text
+        text: root.text
+        write_tab: False
+        multiline: False
+        size_hint: 1, 1
+        font_size: root.font_size
+        font_name: root.font_name
+        font_family: root.font_family
+        pos_hint: {'x': 0, 'y': 0}
+        padding_y: (self.height - self.line_height ) / 2, (self.height - self.line_height ) / 2
+        padding_x: max((24 + common.element_sep * 2) * common.scale, root.padding_x[0]) if root.header_image_display else root.padding_x[0], max((24 + common.element_sep * 3) * common.scale, root.padding_x[1]) if self.delete_display else root.padding_x[1]
+        on_focus: root.on_txt_focus(self, self.focus)
+        radius: root.radius
+        border_width: root.border_width
+        border_color: root.border_color
+        foreground_color: root.foreground_color if len(self.text) else C('#8e8e93')
+        use_bubble: False
+        delete_display: root.delete_display
+        header_image_display: root.header_image_display
+        focus: root.focus
+        halign: root.halign
+        num_type: root.num_type
+        on_text:
+            root.on_txt_text(self, self.text)
+        on_delete:
+            root.on_txt_delete(self)
+
+
+<Tag>:
+    img_dots: img_dots
+    img_select: img_select
+
+    canvas.before:
+        Color:
+            rgba: root.background_color
+        RoundedRectangle:
+            size: self.size
+            pos: self.pos
+            radius: root.radius
+
+    size_hint: root.size_hint
+    Label:
+        id: lbl_tag
+        text: root.text
+        markup: True
+        size_hint: None, 1
+        width: (self.parent.width - img_select.width - img_dots.width - common.element_sep * 6 * common.scale) if img_select.opacity else (self.parent.width - img_dots.width - common.element_sep * 5 * common.scale)
+        pos_hint: {'x': (((common.element_sep * 2 * common.scale + img_select.width + common.element_sep * common.scale) if img_select.opacity else (common.element_sep * 2 * common.scale)) / self.parent.width) if self.parent.width > 0 else 0, 'center_y': .5}
+        text_size: self.size
+        halign: 'left'
+        valign: 'middle'
+        color: root.color
+        font_size: root.font_size
+    Image:
+        id: img_dots
+        source: common.get_image_path('threedots.png')
+        size_hint: None, None
+        size: 24 * common.scale, 24 * common.scale
+        pos_hint: {'right': (self.parent.width - common.element_sep * 2 * common.scale) / self.parent.width if self.parent.width > 0 else 0, 'center_y': .5}
+        opacity: root.dots_opacity
+        disabled: root.dots_disabled
+    Image:
+        id: img_select
+        source: common.get_image_path('bluetick.png')
+        size_hint: None, None
+        size: 0, 24 * common.scale
+        pos_hint: {'x': common.element_sep * 2 * common.scale / self.parent.width if self.parent.width > 0 else 0, 'center_y': .5}
+        opacity: int(root.select) if root.use_select else 0
+
+
+<ThumbnailImage>:
+    canvas:
+        Color:
+            rgba: 1, 1, 1, int(self.select)
+        Rectangle:
+            source: common.get_image_path('bluetick.png')
+            size: 24 * common.scale, 24 * common.scale
+            pos: self.x + self.width - dp(24 + 12), self.y + dp(12)
+        Color:
+            rgba: 1, 1, 1, int(self.delete)
+        Rectangle:
+            source: common.get_image_path('delete_red.png')
+            size: dp(24), dp(24)
+            pos: self.x + dp(12), self.y + dp(12)
+
+
+<Remind>:
+    pnl_tags: pnl_tags
+
+    BoxLayout:
+        orientation: 'vertical'
+        size_hint: .618, None
+        height: lbl_text.height + lbl_secondary.height + sep1.height
+        pos_hint: {'center_x': .5, 'center_y': .5}
+        Label:
+            id: lbl_text
+            text: root.text
+            size_hint: 1, None
+            height: 44 * common.scale
+            text_size: self.size
+            halign: 'center'
+            valign: 'middle'
+            markup: True
+            font_size: root.font_size_title
+            color: root.color
+        Label:
+            id: lbl_secondary
+            text: root.secondary_text
+            text_size: self.width, None
+            size: self.texture_size
+            size_hint: 1, None
+            halign: 'center'
+            valign: 'top'
+            markup: True
+            font_size: root.font_size_secondary
+            color: root.color
+        HorizontalSeparator:
+            id: sep1
+        StackLayout:
+            id: pnl_tags
+            orientation: 'lr-tb'
+            size_hint: 1, None
+            height: root.tag_lines * dp(22)
+            spacing: [common.element_sep / 2 * common.scale, common.element_sep / 4 * common.scale]
+
+
+<ContextDialog>:
+    canvas.before:
+        Color:
+            rgba: .65, .65, .65, root.background_blur
+        Rectangle:
+            size: Window.size
+            pos: 0, 0
+        Color:
+            rgba: 1, 1, 1, 1
+        RoundedRectangle:
+            size: self.size
+            pos: self.pos
+            radius: [(common.rounded_radius * 2 * common.scale,), (common.rounded_radius * 2 * common.scale,), (0,), (0,)]
+
+
+<PopupMenuContent>:
+    pnl_items: pnl_items
+
+    canvas.before:
+        Color:
+            rgba: C('#b1b2b0')
+        RoundedRectangle:
+            size: self.size
+            pos: self.pos
+            radius: root.radius
+
+    orientation: 'vertical'
+    size_hint: None, None
+
+    BoxLayout:
+        id: pnl_items
+        orientation: 'vertical'
+        size_hint: None, None
+        width: root.width
+        height: root.height
+        pos_hint: {'x': 0, 'y': 0}
+
+
+<MessageInfo>:
+    canvas.before:
+        Color:
+            rgba: C('#e5e4e4')
+        RoundedRectangle:
+            size: self.size
+            pos: self.pos
+            radius: root.radius
+
+    Label:
+        text: root.text
+        size_hint: 1, 1
+        pos_hint: {'x': 0, 'y': 0}
+        text_size: self.size
+        halign: 'center'
+        valign: 'middle'
+        color: 0, 0, 0, 1
+        font_size: root.font_size
+
+
+<MessagePanel>:
+    canvas.before:
+        Color:
+            rgba: C('#e5e4e4')
+        RoundedRectangle:
+            size: self.size
+            pos: self.pos
+            radius: root.radius
+
+
+<MiniTag>:
+    canvas.before:
+        Color:
+            rgba: root.background_color
+        RoundedRectangle:
+            size: self.size
+            pos: self.pos
+            radius: self.height / 2, self.height / 2
+
+    text: root.text
+    size_hint: None, None
+    size: self.texture_size[0] + common.element_sep * common.scale, self.texture_size[1]
+    pos_hint: root.pos_hint
+    halign: 'center'
+    color: root.color
+
+
+<ValueSlider>:
+    txt: txt
+    slider: slider
+
+    BackgroundFloatInput:
+        id: txt
+        text: str(root.value)
+        size_hint: None, None
+        width: max(44 * common.scale, len(self.text) * self.font_size * common.scale)
+        height: 44 * common.scale
+        pos_hint: {'x': (common.element_sep * 2 * common.scale) / self.parent.width, 'center_y': .5}
+        border_width: root.border_width
+        radius: root.radius
+        foreground_color: root.foreground_color
+        background_color: root.background_color
+        border_color: root.border_color
+        hint_text: root.hint_text
+        font_size: root.font_size
+        font_name: root.font_name
+        font_family: self.font_family
+        padding_x: root.padding_x
+        header_image_display: False
+        delete_display: False
+        focus: root.focus
+        halign: 'center'
+        num_type: root.num_type
+        on_focus:
+            root.on_txt_focus(*args)
+        on_text:
+            root.on_txt_text(*args)
+    Slider:
+        id: slider
+        size_hint: None, None
+        width: root.width - txt.width - common.element_sep * 5 * common.scale
+        height: 44 * common.scale
+        step: root.step
+        min: root.min
+        max: root.max
+        value: root.value
+        value_track: root.value_track
+        value_track_color: root.value_track_color
+        pos_hint: {'x': (txt.width + common.element_sep * 3 * common.scale) / root.width, 'center_y': .5}
+        on_value: root.on_slider_value(*args)
+
+
+<FullImage>:
+    canvas:
+        Color:
+            rgb: (1, 1, 1)
+        Rectangle:
+            texture: self.texture
+            size: (Window.height * self.image_ratio, Window.height) if self.width > self.height else (Window.width, Window.width / self.image_ratio)
+            pos: (self.x - abs(self.width - Window.width) / 2, self.y - abs(self.height - Window.height) / 2)
+
+    allow_stretch: True
+    keep_ratio: True
+
+
+<MyScatter@FloatLayout>:
+    Scatter:
+        size_hint: 1, 1
+        #pos_hint: {'x': 0, 'y': 0}
+        canvas.before:
+            Color:
+                rgba: 1,0,0,1
+            Rectangle:
+                size: self.size
+                pos: self.pos
+        Image:
+            source: common.get_image_path('4.png', 'background')
+            allow_stretch: True
+
+<HorizontalSeparator>:
+    size_hint: 1, None
+    height: root.height
+#    canvas.before:
+#        Color:
+#            rgba: 0,1,0,1
+#        Rectangle:
+#            size: self.size
+#            pos: self.pos
+
+
+<VerticalSeparator>:
+    size_hint: None, 1
+    width: root.width
+#    canvas.before:
+#        Color:
+#            rgba: 1,1,0,1
+#        Rectangle:
+#            size: self.size
+#            pos: self.pos
+
+
+FloatLayout:
+    RoundedToggle:
+        width: 44 * 2 * common.scale
+        height: 44 * .75 * common.scale
+        icon_off: common.get_image_path('white_theme.png')
+        icon_on: common.get_image_path('dark_theme.png')
+        pos_hint: {'center_x': .5, 'center_y': .5}
