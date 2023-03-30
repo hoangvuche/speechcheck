@@ -27,12 +27,22 @@ class Keywords:
     def keywords(self, val):
         self._keywords = {item: '' for item in val}
 
-    def append(self, keyword):
-        if isinstance(keyword, Keyword):
-            self._keywords[keyword] = ''
-        elif isinstance(keyword, list):
-            for key in keyword:
+    def append(self, keywords, view):
+        for key in keywords:
+            if key not in self._keywords:
+                # key not existed
+                # Save into dict of keys
                 self._keywords[key] = ''
+
+                # Save into db
+                cursor = App.get_running_app().con.cursor()
+                sql = 'INSERT INTO keywords(keyword) VALUES(?)'
+                cursor.execute(sql, (key.text,))
+                App.get_running_app().con.commit()
+                print('Saved', key.text)
+
+        # Notify view for update
+        self.refresh(view)
 
     def remove(self, keyword):
         if isinstance(keyword, Keyword):
@@ -49,7 +59,7 @@ class Keywords:
 
     def refresh(self, view):
         cursor = App.get_running_app().con.cursor()
-        sql = 'select * from keywords'
+        sql = 'SELECT * FROM keywords'
         cursor.execute(sql)
         keys = cursor.fetchall()
         keywords = []

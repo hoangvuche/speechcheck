@@ -3,6 +3,7 @@ from os import path
 
 from kivy.app import App
 from kivy.uix.floatlayout import FloatLayout
+from kivy.uix.gridlayout import GridLayout
 from kivy.properties import StringProperty
 from kivy.utils import get_color_from_hex
 
@@ -37,6 +38,56 @@ class RootWidget(FloatLayout):
     def __init__(self, **kwargs):
         super(RootWidget, self).__init__(**kwargs)
 
+    def bind_all(self):
+        self.btn_add.bind(on_press=self.cb_on_add_press)
+
+    def cb_on_add_press(self, instance):
+        pnl = MessagePanel(size_hint=(None, None),
+                           width=self.width * .5,
+                           height=dp(44) * 3,
+                           radius=[common.rounded_radius, common.rounded_radius,
+                                   common.rounded_radius, common.rounded_radius])
+        self.txt_keyword = TextInput(size_hint=(1, None), height=dp(44),
+                                pos_hint={'center_x': .5, 'y': dp(68) / pnl.height},
+                                hint_text='Nhập một keyword hoặc nhiều keyword cách bằng dấu phẩy')
+
+        btnSave = Button(text='Lưu')
+        btnSaveClose = Button(text='Lưu và thoát')
+        btnClose = Button(text='Thoát')
+
+        btnSave.bind(on_press=self.cb_on_save_press)
+        btnSaveClose.bind(on_press=self.cb_on_save_close_press)
+        btnClose.bind(on_press=self.cb_on_close_press)
+
+        pnl_btn = GridLayout(cols=3, size_hint=(1, None), height=dp(44),
+                             pos_hint={'x': 0, 'y':  dp(12) / pnl.height})
+        pnl_btn.add_widget(btnSave)
+        pnl_btn.add_widget(btnSaveClose)
+        pnl_btn.add_widget(btnClose)
+
+        pnl.add_widget(self.txt_keyword)
+        pnl.add_widget(pnl_btn)
+
+        self.popup_new_keyword = PopupWindow(pnl, use_buttons=False)
+        self.popup_new_keyword.open()
+
+    def cb_on_save_press(self, instance):
+        self.save_keywords()
+
+    def cb_on_save_close_press(self, instance):
+        self.save_keywords()
+        self.popup_new_keyword.dismiss()
+
+    def save_keywords(self):
+        keys = self.txt_keyword.text.strip().split(',')
+        keywords = []
+        for key in keys:
+            keywords.append(Keyword(key.strip()))
+
+        App.get_running_app().controller.save_keywords(keywords)
+    def cb_on_close_press(self, instance):
+        self.popup_new_keyword.dismiss()
+
     def refresh(self, keywords):
         self.grd_keywords.clear_widgets()
         self.grd_keywords.bind(minimum_height=self.grd_keywords.setter('height'))
@@ -50,8 +101,9 @@ class SpeechQCApp(App):
     def on_start(self):
         self.get_db_connection()
         self.keywords = Keywords()
-        controller = QCController(self.keywords, self.root)
-        controller.refresh_keywords()
+        self.controller = QCController(self.keywords, self.root)
+        self.controller.refresh_keywords()
+        self.root.bind_all()
 
     def get_db_connection(self):
         try:

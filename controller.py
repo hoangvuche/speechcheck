@@ -16,8 +16,8 @@ class QCController:
     def get_keywords(self):
         pass
 
-    def save_keyword(self):
-        pass
+    def save_keywords(self, keys):
+        self.keywords.append(keys, self.view)
 
     def remove_keyword(self):
         pass
