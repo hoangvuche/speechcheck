@@ -67,6 +67,7 @@ class Keywords:
             keywords.append(Keyword(key[0]))
         self.keywords = keywords
 
+        # Notify view for update
         view.refresh(self._keywords)
 
 
