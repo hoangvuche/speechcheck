@@ -1,5 +1,6 @@
 from kivy.app import App
 
+
 class Keyword:
 
     def __init__(self, text=''):
