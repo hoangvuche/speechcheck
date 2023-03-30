@@ -4,10 +4,12 @@ from os import path
 from kivy.app import App
 from kivy.uix.floatlayout import FloatLayout
 from kivy.properties import StringProperty
+from kivy.utils import get_color_from_hex
 
 import speech_recognition as sr
 
 from controller import *
+from newwidgets import *
 
 
 def transcribe_audio():
@@ -75,7 +77,51 @@ class KeywordItem(FloatLayout):
 
     def cb_on_touch_up(self, touch, value):
         if self.img.collide_point(*value.pos):
-            print('touch keyword', self.text)
+            btnEdit = RoundedButton(text='Sửa',
+                                    size_hint=(None, None),
+                                    width=dp(200), height=dp(44),
+                                    radius=[(common.rounded_radius, common.rounded_radius),
+                                            (common.rounded_radius, common.rounded_radius),
+                                            (0, 0), (0, 0)],
+                                    font_size='15sp',
+                                    halign='left',
+                                    padding_x=common.element_sep * 2,
+                                    color=get_color_from_hex('#000000'),
+                                    background_color_display=get_color_from_hex('#f3f4f5'))
+            btnRemove = RoundedButton(text='Xóa',
+                                    size_hint=(None, None),
+                                    width=dp(200), height=dp(44),
+                                    radius=[(0, 0), (0, 0),
+                                            (common.rounded_radius, common.rounded_radius),
+                                            (common.rounded_radius, common.rounded_radius)],
+                                    font_size='15sp',
+                                    halign='left',
+                                    padding_x=common.element_sep * 2,
+                                    color=get_color_from_hex('#000000'),
+                                    background_color_display=get_color_from_hex('#f3f4f5'))
+
+            btnEdit.bind(on_touch_up=self.cb_on_edit_touch_up)
+            btnRemove.bind(on_touch_up=self.cb_on_remove_touch_up)
+
+            pop_content = PopupMenuContent()
+            pop_content.add_menu_item(btnEdit)
+            pop_content.add_menu_item(HorizontalSeparator(height=dp(1)))
+            pop_content.add_menu_item(btnRemove)
+
+            pop_menu = PopMenu(value, pop_content)
+            pop_menu.open()
+
+    def cb_on_edit_touch_up(self, instance, value):
+        if not instance.collide_point(*value.pos):
+            return
+
+        print(instance.text, self.text)
+
+    def cb_on_remove_touch_up(self, instance, value):
+        if not instance.collide_point(*value.pos):
+            return
+
+        print(instance.text, self.text)
 
 
 if __name__ == '__main__':
