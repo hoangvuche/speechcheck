@@ -314,6 +314,10 @@ class PopupMenuContent(FloatLayout):
     def __init__(self, **kwargs):
         super(PopupMenuContent, self).__init__(**kwargs)
         self.items = []
+        self.pnl_items.bind(size=self.on_pnl_items_size, pos=self.on_pnl_items_size)
+
+    def on_pnl_items_size(self, instance, value):
+        self.refresh()
 
     def add_menu_item(self, item):
         # Store item to a list
@@ -322,6 +326,13 @@ class PopupMenuContent(FloatLayout):
         # Add item to popup menu content
         self.pnl_items.add_widget(item)
 
+        # Set width of popup menu content equal to the widest item
+        self.width = max([item.width for item in self.items])
+
+        # set height equal to total height of all items
+        self.height = sum([item.height for item in self.items])
+
+    def refresh(self):
         # Set width of popup menu content equal to the widest item
         self.width = max([item.width for item in self.items])
 
@@ -428,14 +439,15 @@ class PopupWindow(PopMenu):
 
     response = None
 
-    def __init__(self, panel, width=Window.width * .618, height=44 * 2 * common.scale, use_buttons=True):
-        radius_val = common.rounded_radius * 3 * common.scale
-        sep = 1 * common.scale
+    def __init__(self, panel, width=Window.width * .618, height=44 * 2 * common.scale, radius_val=dp(common.rounded_radius), use_buttons=True):
+        sep = dp(1)
+
+        panel.bind(size=self.refresh, pos=self.refresh)
 
         if use_buttons:
-            content = PopupMenuContent(radius=[radius_val, radius_val])
+            self.content = PopupMenuContent(radius=[radius_val, radius_val])
         else:
-            content = PopupMenuContent(radius=[radius_val, radius_val, radius_val, radius_val])
+            self.content = PopupMenuContent(radius=[radius_val, radius_val, radius_val, radius_val])
         self.btn_ok = RoundedButton(text='OK', size_hint=(None, None),
                                 width=(panel.width - sep) / 2, height=56 * common.scale,
                                 radius=[(0, 0), (0, 0),
@@ -467,12 +479,15 @@ class PopupWindow(PopMenu):
         pnl_buttons.add_widget(VerticalSeparator(width=sep))
         pnl_buttons.add_widget(self.btn_ok)
 
-        content.add_menu_item(panel)
+        self.content.add_menu_item(panel)
         if use_buttons:
-            content.add_menu_item(HorizontalSeparator(height=1 * common.scale))
-            content.add_menu_item(pnl_buttons)
+            self.content.add_menu_item(HorizontalSeparator(height=dp(1)))
+            self.content.add_menu_item(pnl_buttons)
 
-        super(PopupWindow, self).__init__(None, content, 'window', auto_dismiss=False)
+        super(PopupWindow, self).__init__(None, self.content, 'window', auto_dismiss=False)
+
+    def refresh(self, instance, value):
+        self.content.refresh()
 
     def on_btn_up(self, instance, value):
         """ Handle user's response """

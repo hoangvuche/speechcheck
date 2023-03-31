@@ -8,6 +8,9 @@ from kivy.graphics import Color, RoundedRectangle
 from kivy.utils import get_color_from_hex
 from kivy.metrics import dp
 
+import mutagen
+import wave
+
 
 def get_bundle_dir():
     return os.path.abspath(os.path.dirname(__file__))
@@ -336,3 +339,33 @@ def slide_attribute(wid, attribute, start, end, increment=1*scale, callback=None
 
     if callback:
         callback[0](*callback[1])
+
+
+def is_valid_audio(audio_path):
+    """
+    :param audio_path:
+    :return: either of 'mp3', 'audio', or None
+    """
+
+    try:
+        with wave.open(audio_path, 'rb') as f:
+            print('A wav file')
+            return 'wav'
+    except wave.Error:
+        print('Not a wav file')
+
+    try:
+        f = mutagen.File(audio_path)
+    except mutagen.MutagenError:
+        print('A directory dropped')
+        return None
+
+    if not f:
+        print('Not a valid audio file dropped')
+        return None
+    if 'mpeg-4' in f.info.pprint().lower() or 'MPEG 1 layer 3'.lower() in f.info.pprint().lower():
+        print('A mp3 file dropped')
+        return 'mp3'
+    elif f:
+        print('An audio file dropped')
+        return 'audio'

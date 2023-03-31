@@ -1,20 +1,67 @@
+#:import common common
+#:import get_color_from_hex kivy.utils.get_color_from_hex
+
 RootWidget:
     btn_add: btn_add
+    btn_remove_all: btn_remove_all
     grd_keywords: grd_keywords
+    btn_audio: btn_audio
+    lbl_file: lbl_file
+    btn_check: btn_check
+    img_load: img_load
+    lbl_transcript: lbl_transcript
 
+    canvas.before:
+        Color:
+            rgba: 1,1,1,1
+        Rectangle:
+            pos: self.pos
+            size: self.size
+
+    HorizontalSeparator:
+        id: sep_top
+        height: dp(2)
+        pos_hint: {'x': 0,'top': 1}
     FloatLayout:
         id: pnl_left
-        size_hint: .2, 1
+        size_hint: .2, (root.height - sep_top.height)/ root.height
         pos_hint: {'x': 0, 'y': 0}
 
-        Button:
-            id: btn_add
-            text: 'Thêm keyword'
-            font_size: '15sp'
+        GridLayout:
+            id: grd_btn
+            cols: 5
             size_hint: 1, None
-            height: self.texture_size[1] + dp(10)
+            height: btn_add.height
             pos_hint: {'x': 0, 'top': 1}
+            row_default_height: dp(40)
+            row_force_default: True
 
+            VerticalSeparator:
+                width: dp(1)
+
+            RoundedButton:
+                id: btn_add
+                text: 'Thêm keyword'
+                font_size: '15sp'
+                radius: common.rounded_radius, common.rounded_radius, common.rounded_radius, common.rounded_radius
+
+            VerticalSeparator:
+                width: dp(1)
+
+            RoundedButton:
+                id: btn_remove_all
+                text: 'Xóa hết'
+                font_size: '15sp'
+                background_color_display: 1, 0, 0, 1
+                radius: common.rounded_radius, common.rounded_radius, common.rounded_radius, common.rounded_radius
+
+            VerticalSeparator:
+                width: dp(1)
+
+        HorizontalSeparator:
+            id: sep_bottom
+            height: dp(2)
+            pos_hint: {'x': 0, 'top': (self.parent.height - grd_btn.height) / self.parent.height}
         ScrollView:
             canvas.before:
                 Color:
@@ -22,7 +69,7 @@ RootWidget:
                 Rectangle:
                     pos: self.pos
                     size: self.size
-            size_hint: 1, (self.parent.height - btn_add.height) / self.parent.height
+            size_hint: 1, (self.parent.height - grd_btn.height - sep_bottom.height) / self.parent.height
             pos_hint: {'x': 0, 'y': 0}
 
             GridLayout:
@@ -33,11 +80,10 @@ RootWidget:
                 row_force_default: True
                 row_default_height: dp(40)
 
-
     FloatLayout:
         canvas.before:
             Color:
-                rgba: 0,1,0,1
+                rgba: 1,1,1,1
             Rectangle:
                 pos: self.pos
                 size: self.size
@@ -45,6 +91,108 @@ RootWidget:
         id: pnl_right
         size_hint: .8, 1
         pos_hint: {'y': 0, 'right':1}
+
+        HorizontalSeparator:
+            id: sep_right_top
+            height: dp(2)
+            pos_hint: {'x': 0, 'top': 1}
+
+        VerticalSeparator:
+            id: sep_right_left
+            width: dp(4)
+            pos_hint: {'x': 0, 'y': 0}
+
+        GridLayout:
+            id: grd_file_chooser
+            cols: 3
+            size_hint: None, None
+            height: btn_add.height
+            width: self.parent.width - sep_right_left.width
+            pos_hint: {'x': sep_right_left.width / self.parent.width, 'top': (self.parent.height - sep_right_top.height) / self.parent.height}
+
+            RoundedButton:
+                id: btn_audio
+                text: 'Chọn file audio'
+                radius: common.rounded_radius, common.rounded_radius, common.rounded_radius, common.rounded_radius
+                font_size: '15sp'
+                size_hint: None, None
+                size: btn_add.width, dp(40)
+                pos_hint: {'x': 0, 'y': 0}
+            VerticalSeparator:
+                id: sep_audio_txt
+                width: dp(4)
+                pos_hint: {'x': (self.parent.width - btn_audio.width) / self.parent.width, 'y': 0}
+            Label:
+                id: lbl_file
+                text: ''
+                size_hint: None, None
+                height: btn_audio.height
+                width: self.parent.width - btn_audio.width - sep_audio_txt.width
+                color: 0, 0, 0, 1
+                font_size: '15sp'
+                text_size: self.size
+                halign: 'left'
+                valign: 'middle'
+                italic: True
+        RoundedButton:
+            id: btn_check
+            text: 'Check keyword QC'
+            radius: common.rounded_radius, common.rounded_radius, common.rounded_radius, common.rounded_radius
+            size_hint: .618, None
+            height: dp(40)
+            pos_hint: {'center_x': .5, 'top': (self.parent.height - sep_right_top.height - grd_file_chooser.height) / self.parent.height}
+
+        HorizontalSeparator:
+            id: sep_btn_check_gif
+            height: dp(4)
+            pos_hint: {'x': 0,'top': (self.parent.height - sep_right_top.height - grd_file_chooser.height - btn_check.height) / self.parent.height}
+
+        FloatLayout:
+            canvas.before:
+                Color:
+                    rgba: get_color_from_hex('#e5eff1')
+                Rectangle:
+                    pos: self.pos
+                    size: self.size
+            id: pnl_result
+            size_hint: None, (self.parent.height - sep_right_top.height - grd_file_chooser.height - btn_check.height - sep_btn_check_gif.height) / self.parent.height
+            width: self.parent.width - sep_right_left.width
+            pos_hint: {'x': sep_right_left.width / self.parent.width, 'y': 0}
+
+            ScrollView:
+                id: scrl
+                size_hint: 1, 1
+                pos_hint: {'x': 0, 'y': 0}
+
+                FloatLayout:
+                    size_hint_y: None
+                    height: lbl_transcript.height + lbl_report.height
+
+                    Image:
+                        id: img_load
+                        source: './images/loading.zip'
+                        size_hint: None, None,
+                        size: dp(0), dp(0)
+                        pos_hint: {'center_x': .5, 'top': 1}
+                        anim_delay: 0
+
+                    Label:
+                        id: lbl_transcript
+                        text: ''
+                        color: 0, 0, 0, 1
+                        size_hint: 1, None
+                        pos_hint: {'x': 0, 'top': 1}
+                        text_size: self.parent.width, None
+                        height: min(scrl.height, self.texture_size[1])
+                        halign: 'left'
+                        valign: 'top'
+                        markup: True
+
+                    FloatLayout:
+                        id: lbl_report
+                        size_hint: 1, None
+                        height: dp(500)
+                        pos_hint: {'x': 0, 'top': (self.parent.height - lbl_transcript.height) / self.parent.height}
 
 
 <KeyWordItem>:
@@ -69,3 +217,69 @@ RootWidget:
         size_hint: None, None
         size: dp(24), dp(24)
         pos_hint: {'x': (root.width - self.width) / root.width, 'center_y': .5}
+
+
+<AddNewKeywordPanel>:
+    txt_keyword: txt_keyword
+    btn_save: btnSave
+    btn_save_close: btnSaveClose
+    btn_close: btnClose
+
+    size_hint: None, None
+    width: root.width
+    height: root.height
+    radius: common.rounded_radius, common.rounded_radius, common.rounded_radius, common.rounded_radius
+
+    VerticalSeparator:
+        id: sep_left
+        width: dp(4)
+        pos_hint: {'x': 0, 'y': 0}
+
+    TextInput:
+        id: txt_keyword
+        size_hint: 0 if not root.width else (root.width - sep_left.width - sep_right.width) / root.width, None
+        height: dp(44)
+        pos_hint: {'center_x': .5, 'y': 0 if root.height == 0 else dp(68) / root.height}
+        hint_text: 'Nhập một keyword hoặc nhiều keyword cách bằng dấu phẩy'
+        text: root.text
+
+    GridLayout:
+        cols: 3
+        size_hint: (0 if not root.width else (root.width - sep_left.width - sep_right.width) / root.width, None)
+        height: dp(44)
+        pos_hint: {'x': 0, 'y':  0 if root.height == 0 else dp(12) / root.height}
+
+        Button:
+            id: btnSave
+            text: 'Lưu'
+        Button:
+            id: btnSaveClose
+            text: 'Lưu và thoát'
+        Button:
+            id: btnClose
+            text: 'Thoát'
+
+    VerticalSeparator:
+        id: sep_right
+        width: dp(4)
+        pos_hint: {'right': 1, 'y': 0}
+
+<LoadDialog>:
+    BoxLayout:
+        size: root.size
+        pos: root.pos
+        orientation: "vertical"
+        FileChooserListView:
+            id: filechooser
+            filter_dirs: True
+
+        BoxLayout:
+            size_hint_y: None
+            height: 30
+            Button:
+                text: "Cancel"
+                on_release: root.cancel()
+
+            Button:
+                text: "Load"
+                on_release: root.load(filechooser.path, filechooser.selection)

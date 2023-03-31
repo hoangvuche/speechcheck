@@ -1,3 +1,6 @@
+import sqlite3
+import re
+
 from kivy.app import App
 
 
@@ -30,33 +33,56 @@ class Keywords:
 
     def append(self, keywords, view):
         for key in keywords:
-            if key not in self._keywords:
-                # key not existed
+            if not self.is_duplicate(key):
+                # Only process if key is not already existed
                 # Save into dict of keys
                 self._keywords[key] = ''
 
                 # Save into db
                 cursor = App.get_running_app().con.cursor()
                 sql = 'INSERT INTO keywords(keyword) VALUES(?)'
-                cursor.execute(sql, (key.text,))
+                try:
+                    cursor.execute(sql, (key.text,))
+                except sqlite3.IntegrityError:
+                    print('Duplicate keyword', key.text)
+                    continue
                 App.get_running_app().con.commit()
                 print('Saved', key.text)
 
         # Notify view for update
         self.refresh(view)
 
-    def remove(self, keyword):
-        if isinstance(keyword, Keyword):
-            try:
-                del self._keywords[keyword]
-            except KeyError:
-                print('Keyword {0} not existed'.format(keyword.text))
-        elif isinstance(keyword, list):
-            for key in keyword:
-                try:
-                    del self._keywords[key]
-                except KeyError:
-                    print('Keyword {0} not existed'.format(key.text))
+    def update(self, old_keyword, new_keyword, view):
+        cursor = App.get_running_app().con.cursor()
+        sql = 'UPDATE keywords SET keyword = ? WHERE keyword = ?'
+        try:
+            cursor.execute(sql, (new_keyword.text, old_keyword.text))
+        except sqlite3.IntegrityError:
+            print('Duplicate keyword', new_keyword.text)
+        App.get_running_app().con.commit()
+        print('Updated', old_keyword.text, 'to', new_keyword.text)
+        self.refresh(view)
+
+    def is_duplicate(self, keyword):
+        for key in self.keywords:
+            if key.text == keyword.text:
+                return True
+        return False
+
+    def remove(self, keyword, view):
+        cursor = App.get_running_app().con.cursor()
+        sql = 'DELETE FROM keywords WHERE keyword = ?'
+        cursor.execute(sql, (keyword.text,))
+        App.get_running_app().con.commit()
+        print('Removed keyword', keyword.text)
+        self.refresh(view)
+
+    def remove_all(self, view):
+        cursor = App.get_running_app().con.cursor()
+        sql = 'DELETE FROM keywords'
+        cursor.execute(sql)
+        App.get_running_app().con.commit()
+        self.refresh(view)
 
     def refresh(self, view):
         cursor = App.get_running_app().con.cursor()
@@ -70,6 +96,32 @@ class Keywords:
 
         # Notify view for update
         view.refresh(self._keywords)
+
+    def check_keywords(self, transcript, view):
+        # Check keywords
+        result = {}
+        result['transcript'] = transcript
+        result['keywords'] = {}
+        for keyword in self._keywords:
+            # Check keyword existence one by one
+            result['keywords'][keyword] = [m.start() for m in re.finditer(keyword.text, transcript)]
+
+        # Mark found keywords
+        for keyword, val in result['keywords'].items():
+            result['transcript'] = self.check_keyword(keyword, val, result['transcript'])
+
+        # Update UI
+        view.display_keywordQC_result(result)
+
+    def check_keyword(self, keyword, positions, transcript):
+        accumulated_spaces = 0
+        for pos in positions:
+            transcript = (transcript[:pos + accumulated_spaces] + '[color=#ff0000][b]' + transcript[pos + accumulated_spaces:])
+            accumulated_spaces += len('[color=#ff0000][b]')
+            transcript = (transcript[:pos + len(keyword.text) + accumulated_spaces]
+                          + '[/b][/color]' + transcript[pos + len(keyword.text) + accumulated_spaces:])
+            accumulated_spaces += len('[/b][/color]')
+        return transcript
 
 
 if __name__ == '__main__':

@@ -1,36 +1,16 @@
 import sqlite3
 from os import path
+from threading import Thread
 
 from kivy.app import App
 from kivy.uix.floatlayout import FloatLayout
 from kivy.uix.gridlayout import GridLayout
+from kivy.uix.popup import Popup
 from kivy.properties import StringProperty
 from kivy.utils import get_color_from_hex
 
-import speech_recognition as sr
-
 from controller import *
 from newwidgets import *
-
-
-def transcribe_audio():
-    print('Checking TC recording')
-    audio_file = path.join(path.dirname(path.realpath(__file__)), "speech2.wav")
-
-    # use the audio file as the audio source
-    r = sr.Recognizer()
-    with sr.AudioFile(audio_file) as source:
-        audio = r.record(source)  # read the entire audio file
-
-    try:
-        # for testing purposes, we're just using the default API key
-        # to use another API key, use `r.recognize_google(audio, key="GOOGLE_SPEECH_RECOGNITION_API_KEY")`
-        # instead of `r.recognize_google(audio)`
-        print("Google Speech Recognition thinks you said " + r.recognize_google(audio, language='vi-VN'))
-    except sr.UnknownValueError:
-        print("Google Speech Recognition could not understand audio")
-    except sr.RequestError as e:
-        print("Could not request results from Google Speech Recognition service; {0}".format(e))
 
 
 class RootWidget(FloatLayout):
@@ -39,52 +19,94 @@ class RootWidget(FloatLayout):
         super(RootWidget, self).__init__(**kwargs)
 
     def bind_all(self):
-        self.btn_add.bind(on_press=self.cb_on_add_press)
+        self.btn_add.bind(on_touch_up=self.cb_on_add_up)
+        self.btn_remove_all.bind(on_touch_up=self.cb_on_remove_all_up)
+        self.btn_audio.bind(on_touch_up=self.cb_on_audio_up)
+        self.btn_check.bind(on_touch_up=self.cb_on_check_up)
 
-    def cb_on_add_press(self, instance):
-        pnl = MessagePanel(size_hint=(None, None),
-                           width=self.width * .5,
-                           height=dp(44) * 3,
-                           radius=[common.rounded_radius, common.rounded_radius,
-                                   common.rounded_radius, common.rounded_radius])
-        self.txt_keyword = TextInput(size_hint=(1, None), height=dp(44),
-                                pos_hint={'center_x': .5, 'y': dp(68) / pnl.height},
-                                hint_text='Nhập một keyword hoặc nhiều keyword cách bằng dấu phẩy')
+    def cb_on_add_up(self, instance, value):
+        if not instance.collide_point(*value.pos):
+            return
+        self.show_add_keyword()
 
-        btnSave = Button(text='Lưu')
-        btnSaveClose = Button(text='Lưu và thoát')
-        btnClose = Button(text='Thoát')
+    def cb_on_remove_all_up(self, instance, value):
+        if not instance.collide_point(*value.pos):
+            return
+        App.get_running_app().controller.remove_all()
 
-        btnSave.bind(on_press=self.cb_on_save_press)
-        btnSaveClose.bind(on_press=self.cb_on_save_close_press)
-        btnClose.bind(on_press=self.cb_on_close_press)
+    def cb_on_audio_up(self, instance, value):
+        if not instance.collide_point(*value.pos):
+            return
+        self.show_media()
 
-        pnl_btn = GridLayout(cols=3, size_hint=(1, None), height=dp(44),
-                             pos_hint={'x': 0, 'y':  dp(12) / pnl.height})
-        pnl_btn.add_widget(btnSave)
-        pnl_btn.add_widget(btnSaveClose)
-        pnl_btn.add_widget(btnClose)
+    def cb_on_check_up(self, instance, value):
+        if not instance.collide_point(*value.pos) or instance.disabled:
+            return
+        if self.lbl_file.text == '':
+            print('No file selected')
+            return
+        if hasattr(self, 'thread_transcription'):
+            if self.thread_transcription.is_alive():
+                print('Another thread is running, please wait!')
+                return
 
-        pnl.add_widget(self.txt_keyword)
-        pnl.add_widget(pnl_btn)
+        instance.disabled = True
 
-        self.popup_new_keyword = PopupWindow(pnl, use_buttons=False)
+        self.thread_transcription = Thread(target=App.get_running_app().controller.transcribe_audio,
+                                           name='thread_transcription',
+                                           args=(self.lbl_file.text,))
+        self.thread_transcription.start()
+
+        self.img_load.size = (dp(48), dp(48))
+        self.lbl_transcript.text = ''
+
+    def show_add_keyword(self, keyword=None):
+        self.add_key_content = AddNewKeywordPanel(width=self.width * .5, height=dp(44) * 3,
+                                                  text=keyword.text if keyword else '',
+                                                  keyword=keyword)
+        self.add_key_content.btn_save.bind(on_press=self.cb_on_save_press)
+        self.add_key_content.btn_save_close.bind(on_press=self.cb_on_save_close_press)
+        self.add_key_content.btn_close.bind(on_press=self.cb_on_close_press)
+
+        self.popup_new_keyword = PopupWindow(self.add_key_content, use_buttons=False)
+
         self.popup_new_keyword.open()
+
+    def on_size(self, instance, value):
+        if hasattr(self, 'add_key_content'):
+            self.add_key_content.width = self.width * .5
 
     def cb_on_save_press(self, instance):
         self.save_keywords()
+        self.add_key_content.txt_keyword.text = ''
 
     def cb_on_save_close_press(self, instance):
         self.save_keywords()
         self.popup_new_keyword.dismiss()
 
-    def save_keywords(self):
-        keys = self.txt_keyword.text.strip().split(',')
-        keywords = []
-        for key in keys:
-            keywords.append(Keyword(key.strip()))
+    def save_keywords(self, mode='add'):
+        if self.add_key_content.txt_keyword.text.strip() == '':
+            # Return if empty string
+            return
 
-        App.get_running_app().controller.save_keywords(keywords)
+        if self.add_key_content.keyword:
+            # Edit
+            keys = self.add_key_content.txt_keyword.text.strip()
+        else:
+            # Add
+            keys = self.add_key_content.txt_keyword.text.strip().split(',')
+        keywords = []
+
+        if hasattr(self.add_key_content, 'old_keyword'):
+            # Edit
+            print('edit', self.add_key_content.old_keyword, self.add_key_content.old_keyword.text)
+            App.get_running_app().controller.update_keyword(self.add_key_content.old_keyword, Keyword(text=keys))
+        else:
+            # Add
+            for key in keys:
+                keywords.append(Keyword(key.strip()))
+            App.get_running_app().controller.save_keywords(keywords)
+
     def cb_on_close_press(self, instance):
         self.popup_new_keyword.dismiss()
 
@@ -95,8 +117,52 @@ class RootWidget(FloatLayout):
             keyitem = KeywordItem(text=keyword.text)
             self.grd_keywords.add_widget(keyitem)
 
+    def show_media(self):
+        content = LoadDialog(load=self.load_media_file, cancel=self.dismiss_popup)
+        self._popup = Popup(title="Chọn media", content=content,
+                            size_hint=(0.9, 0.9))
+        self._popup.open()
+
+    def load_media_file(self, path, filename):
+        if App.get_running_app().mode == 'production':
+            # Production mode
+            self.lbl_file.text = filename[0]
+        else:
+            # Debug mode
+            self.lbl_file.text = os.path.join('.', 'speech1.wav')
+
+        # Check audio file or otherwise
+        audio_type = common.is_valid_audio(filename[0])
+
+        if not audio_type:
+            print('Invalid audio file')
+            self.lbl_file.text = ''
+            return
+        else:
+            # Audio file, start thread load audio
+            print('Valid audio file')
+
+        self.dismiss_popup()
+
+    def dismiss_popup(self):
+        self._popup.dismiss()
+
+    def display_keywordQC_result(self, result):
+        self.img_load.size = (0, 0)
+        self.btn_check.disabled = False
+        self.lbl_transcript.text = result['transcript']
+
+        for key, val in result['keywords'].items():
+            print(key.text, val)
+
+        print(result['transcript'])
+
 
 class SpeechQCApp(App):
+    # mode = 'debug'
+    mode = 'production'
+    icon = os.path.join(common.get_bundle_dir(), 'images', 'anydo_104098.png')
+    title = 'Record QC'
 
     def on_start(self):
         self.get_db_connection()
@@ -160,20 +226,37 @@ class KeywordItem(FloatLayout):
             pop_content.add_menu_item(HorizontalSeparator(height=dp(1)))
             pop_content.add_menu_item(btnRemove)
 
-            pop_menu = PopMenu(value, pop_content)
-            pop_menu.open()
+            self.pop_menu = PopMenu(value, pop_content)
+            self.pop_menu.open()
 
     def cb_on_edit_touch_up(self, instance, value):
         if not instance.collide_point(*value.pos):
             return
-
-        print(instance.text, self.text)
+        App.get_running_app().root.show_add_keyword(keyword=Keyword(text=self.text))
+        self.pop_menu.dismiss()
 
     def cb_on_remove_touch_up(self, instance, value):
         if not instance.collide_point(*value.pos):
             return
+        App.get_running_app().controller.remove_keyword(Keyword(text=self.text))
+        self.pop_menu.dismiss()
 
-        print(instance.text, self.text)
+
+class AddNewKeywordPanel(MessagePanel):
+    text = StringProperty('')
+
+    def __init__(self, keyword=None, **kwargs):
+        super(AddNewKeywordPanel, self).__init__(**kwargs)
+
+        self.keyword = keyword
+
+        if self.keyword:
+            self.old_keyword = keyword
+
+
+class LoadDialog(FloatLayout):
+    load = ObjectProperty(None)
+    cancel = ObjectProperty(None)
 
 
 if __name__ == '__main__':
