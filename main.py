@@ -8,12 +8,14 @@ from kivy.uix.gridlayout import GridLayout
 from kivy.uix.popup import Popup
 from kivy.properties import StringProperty
 from kivy.utils import get_color_from_hex
+from kivy.clock import Clock
 
 from controller import *
 from newwidgets import *
 
 
 class RootWidget(FloatLayout):
+    qc_result = ObjectProperty(None)
 
     def __init__(self, **kwargs):
         super(RootWidget, self).__init__(**kwargs)
@@ -152,15 +154,22 @@ class RootWidget(FloatLayout):
         self.btn_check.disabled = False
         self.lbl_transcript.text = result['transcript']
 
-        for key, val in result['keywords'].items():
-            print(key.text, val)
+        self.qc_result = result
+        Clock.schedule_once(self.draw_qc_result, -1)
 
-        print(result['transcript'])
+    def draw_qc_result(self, value):
+        self.grd_report.bind(minimum_height=self.grd_report.setter('height'))
+        self.grd_report.add_widget(CellItem(description='Keyword', frequency='Tần suất', is_header=True))
+        cnt = 0
+        for key, val in self.qc_result['keywords'].items():
+            cnt += 1
+            self.grd_report.add_widget(CellItem(description=key.text, frequency=str(len(val)),
+                                                is_last=True if cnt == len(self.qc_result['keywords'].keys()) else False))
 
 
 class SpeechQCApp(App):
-    # mode = 'debug'
-    mode = 'production'
+    mode = 'debug'
+    # mode = 'production'
     icon = os.path.join(common.get_bundle_dir(), 'images', 'anydo_104098.png')
     title = 'Record QC'
 
@@ -257,6 +266,14 @@ class AddNewKeywordPanel(MessagePanel):
 class LoadDialog(FloatLayout):
     load = ObjectProperty(None)
     cancel = ObjectProperty(None)
+
+
+class CellItem(FloatLayout):
+    description = StringProperty('')
+    frequency = StringProperty('')
+    is_header = BooleanProperty(False)
+    is_last = BooleanProperty(False)
+    color = ListProperty(get_color_from_hex('#000000'))
 
 
 if __name__ == '__main__':

@@ -10,6 +10,7 @@ RootWidget:
     btn_check: btn_check
     img_load: img_load
     lbl_transcript: lbl_transcript
+    grd_report: grd_report
 
     canvas.before:
         Color:
@@ -144,7 +145,7 @@ RootWidget:
 
         HorizontalSeparator:
             id: sep_btn_check_gif
-            height: dp(4)
+            height: dp(4) * 2
             pos_hint: {'x': 0,'top': (self.parent.height - sep_right_top.height - grd_file_chooser.height - btn_check.height) / self.parent.height}
 
         FloatLayout:
@@ -188,11 +189,24 @@ RootWidget:
                         valign: 'top'
                         markup: True
 
+                    HorizontalSeparator:
+                        id: sep_transcript_report
+                        height: dp(4) * 2
+                        pos_hint: {'x': 0, 'top': (self.parent.height - lbl_transcript.height) / self.parent.height}
+
                     FloatLayout:
                         id: lbl_report
                         size_hint: 1, None
-                        height: dp(500)
-                        pos_hint: {'x': 0, 'top': (self.parent.height - lbl_transcript.height) / self.parent.height}
+                        height: max(dp(500), grd_report.height)
+                        pos_hint: {'x': 0, 'top': (self.parent.height - lbl_transcript.height - sep_transcript_report.height) / self.parent.height}
+
+                        GridLayout:
+                            id: grd_report
+                            size_hint: .618, None
+                            pos_hint: {'center_x': .5, 'top': 1}
+                            cols: 1
+                            row_default_height: dp(44)
+                            row_force_default: True
 
 
 <KeyWordItem>:
@@ -283,3 +297,42 @@ RootWidget:
             Button:
                 text: "Load"
                 on_release: root.load(filechooser.path, filechooser.selection)
+
+<CellItem>:
+    canvas.before:
+        Color:
+            rgba: 1, 0, 0, 1
+        Rectangle:
+            size: self.size
+            pos: self.pos
+
+    size_hint: 1, 1
+
+    Label:
+        canvas.before:
+            Color:
+                rgba: 1, 1, 1, 1
+            Rectangle:
+                size: self.size
+                pos: self.pos
+        id: lbl_description
+        text: root.description
+        size_hint: None, None
+        size: (self.parent.width - dp(3)) / 2, (self.parent.height - dp(2)) if root.is_last else (self.parent.height - dp(1))
+        pos_hint: {'x': dp(1) / self.parent.width, 'y': (dp(1) / self.parent.height) if root.is_last else 0}
+        color: get_color_from_hex('#000000') if (root.is_header or int(root.frequency) == 0) else get_color_from_hex('#ff0000')
+        bold: root.is_header
+    Label:
+        canvas.before:
+            Color:
+                rgba: 1, 1, 1, 1
+            Rectangle:
+                size: self.size
+                pos: self.pos
+        id: lbl_value
+        text: root.frequency
+        size_hint: None, None
+        size: (self.parent.width - dp(3)) / 2, (self.parent.height - dp(2)) if root.is_last else (self.parent.height - dp(1))
+        pos_hint: {'right': (self.parent.width - dp(1)) / self.parent.width, 'y': (dp(1) / self.parent.height) if root.is_last else 0}
+        color: get_color_from_hex('#000000') if (root.is_header or int(root.frequency) == 0) else get_color_from_hex('#ff0000')
+        bold: root.is_header

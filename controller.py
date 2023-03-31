@@ -53,7 +53,7 @@ class QCController:
                 transcript = r.recognize_google(audio, language='vi-VN')
             else:
                 # Debug mode
-                time.sleep(3)
+                time.sleep(1)
                 transcript = s
         except sr.UnknownValueError:
             transcript = "Google Speech Recognition could not understand audio"
