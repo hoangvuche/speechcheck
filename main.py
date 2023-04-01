@@ -37,7 +37,7 @@ class RootWidget(FloatLayout):
         App.get_running_app().controller.remove_all()
 
     def cb_on_audio_up(self, instance, value):
-        if not instance.collide_point(*value.pos):
+        if not instance.collide_point(*value.pos) or instance.disabled:
             return
         self.show_media()
 
@@ -53,6 +53,7 @@ class RootWidget(FloatLayout):
                 return
 
         instance.disabled = True
+        self.btn_audio.disabled = True
 
         self.thread_transcription = Thread(target=App.get_running_app().controller.transcribe_audio,
                                            name='thread_transcription',
@@ -152,6 +153,7 @@ class RootWidget(FloatLayout):
     def display_keywordQC_result(self, result):
         self.img_load.size = (0, 0)
         self.btn_check.disabled = False
+        self.btn_audio.disabled = False
         self.lbl_transcript.text = result['transcript']
 
         self.qc_result = result
@@ -168,8 +170,8 @@ class RootWidget(FloatLayout):
 
 
 class SpeechQCApp(App):
-    mode = 'debug'
-    # mode = 'production'
+    # mode = 'debug'
+    mode = 'production'
     icon = os.path.join(common.get_bundle_dir(), 'images', 'anydo_104098.png')
     title = 'Record QC'
 
