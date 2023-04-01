@@ -222,7 +222,7 @@ class KeywordItem(FloatLayout):
                                             (common.rounded_radius, common.rounded_radius),
                                             (0, 0), (0, 0)],
                                     font_size='15sp',
-                                    halign='left',
+                                    halign='center',
                                     padding_x=common.element_sep * 2,
                                     color=get_color_from_hex('#000000'),
                                     background_color_display=get_color_from_hex('#f3f4f5'))
@@ -233,7 +233,7 @@ class KeywordItem(FloatLayout):
                                             (common.rounded_radius, common.rounded_radius),
                                             (common.rounded_radius, common.rounded_radius)],
                                     font_size='15sp',
-                                    halign='left',
+                                    halign='center',
                                     padding_x=common.element_sep * 2,
                                     color=get_color_from_hex('#000000'),
                                     background_color_display=get_color_from_hex('#f3f4f5'))
