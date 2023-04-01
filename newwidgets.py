@@ -1,31 +1,30 @@
 import os
-import time
-import re
-from _thread import start_new_thread
-from plyer import vibrator
 import platform
+import re
+import time
+from _thread import start_new_thread
 
-import kivy.utils
-from kivy.lang.builder import Builder
-from kivy.core.window import Window
+from kivy.animation import Animation
 from kivy.app import App
-from kivy.utils import get_color_from_hex
-from kivy.uix.button import Button
-from kivy.uix.behaviors import ButtonBehavior
-from kivy.uix.textinput import TextInput
-from kivy.uix.floatlayout import FloatLayout
-from kivy.uix.boxlayout import BoxLayout
-from kivy.uix.modalview import ModalView
-from kivy.uix.label import Label
-from kivy.graphics import Color, RoundedRectangle, Line, Rectangle
+from kivy.clock import Clock
+from kivy.core.window import Window
+from kivy.graphics import Color, RoundedRectangle, Rectangle
+from kivy.graphics.context_instructions import PushMatrix, PopMatrix, Rotate
+from kivy.lang.builder import Builder
+from kivy.metrics import dp
 from kivy.properties import (ListProperty, ColorProperty, NumericProperty, BooleanProperty,
                              StringProperty, ObjectProperty, ReferenceListProperty)
-from kivy.graphics.context_instructions import PushMatrix, PopMatrix, Rotate
-from kivy.animation import Animation
+from kivy.uix.behaviors import ButtonBehavior
+from kivy.uix.boxlayout import BoxLayout
+from kivy.uix.button import Button
+from kivy.uix.floatlayout import FloatLayout
 from kivy.uix.image import Image
+from kivy.uix.label import Label
+from kivy.uix.modalview import ModalView
 from kivy.uix.stencilview import StencilView
-from kivy.metrics import dp
-from kivy.clock import Clock
+from kivy.uix.textinput import TextInput
+from kivy.utils import get_color_from_hex
+from plyer import vibrator
 
 import common
 
