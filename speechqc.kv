@@ -1,5 +1,6 @@
 #:import common common
 #:import get_color_from_hex kivy.utils.get_color_from_hex
+#:import path os.path
 
 RootWidget:
     btn_add: btn_add
@@ -8,9 +9,11 @@ RootWidget:
     btn_audio: btn_audio
     lbl_file: lbl_file
     btn_check: btn_check
+    scrl: scrl
     img_load: img_load
     lbl_transcript: lbl_transcript
     grd_report: grd_report
+    btn_export: btn_export
 
     canvas.before:
         Color:
@@ -147,6 +150,20 @@ RootWidget:
             id: sep_btn_check_gif
             height: dp(4) * 2
             pos_hint: {'x': 0,'top': (self.parent.height - sep_right_top.height - grd_file_chooser.height - btn_check.height) / self.parent.height}
+
+        VerticalSeparator:
+            id: sep_btn_check_export
+            width: dp(4) * 2
+            pos_hint: {'x': (self.parent.width - (btn_check.width / .618 * .191)) / self.parent.width, 'top': (self.parent.height - sep_right_top.height - grd_file_chooser.height) / self.parent.height}
+
+        RoundedImageButton:
+            id: btn_export
+            source: path.join(common.get_bundle_dir(), 'images', 'export.png')
+            background_color_display: 0,0,0,0
+            radius: common.rounded_radius, common.rounded_radius, common.rounded_radius, common.rounded_radius
+            size_hint: None, None
+            size: dp(40), dp(40)
+            pos_hint: {'x': (self.parent.width - (btn_check.width / .618 * .191) + sep_btn_check_export.width) / self.parent.width, 'top': (self.parent.height - sep_right_top.height - grd_file_chooser.height) / self.parent.height}
 
         FloatLayout:
             canvas.before:

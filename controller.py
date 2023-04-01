@@ -1,8 +1,12 @@
 import time
+import os
 
 import speech_recognition as sr
 from time import sleep
 
+from fpdf import FPDF
+
+import common
 from keys import *
 
 
@@ -61,3 +65,97 @@ class QCController:
             transcript = "Could not request results from Google Speech Recognition service; {0}".format(e)
 
         self.keywords.check_keywords(transcript.strip(), self.view)
+
+    def export_report(self, content):
+        try:
+            pdf = PDF('P', format='A4')
+            pdf.alias_nb_pages()
+            pdf.add_page()
+            pdf.add_font('DejaVu', '', os.path.join(common.get_bundle_dir(), 'font', 'DejaVuSansCondensed.ttf'), uni=True)
+            pdf.add_font('DejaVu', '', os.path.join(common.get_bundle_dir(), 'font', 'DejaVuSans-Bold.ttf'), uni=True)
+            pdf.set_font('DejaVu', style='', size=12)
+
+            # Write part 1 - record name
+            pdf.cell(185, 7, '1. RECORD FILE: ' + content['filename'][1], border=0, ln=1)
+            # Write blank line
+            pdf.cell(185, 7, '', border=0, ln=1)
+            # Write part 2 - conversation
+            pdf.cell(185, 7, '2. NỘI DUNG RECORD:', border=0, ln=1)
+            # Write word by word
+            self.write_conversation(content['transcript'], pdf)
+            # Write blank line
+            pdf.cell(185, 7 * 2, '', border=0, ln=1)
+            # Write part 3 - Statistics
+            pdf.cell(185, 7, '3. THỐNG KÊ SAI PHẠM:', border=0, ln=1)
+            # Write statistics
+            self.write_statistics(content['keywords'], pdf)
+            # Write blank line
+            pdf.cell(185, 7, '', border=0, ln=1)
+            # Write end notification
+            pdf.set_x(55)
+            notification = 'End of report'
+            pdf.cell((210 - pdf.get_string_width(notification)) / 2, 7, notification, border=0, ln=1, align='C')
+
+            out_file = ''.join((os.path.splitext(content['filename'][1])[0], '.pdf'))
+            pdf.output(out_file, 'F')
+            return out_file
+        except Exception:
+            return False
+
+    def write_conversation(self, s, pdf):
+        words = s.split(' ')
+        row_len = 10        # Left border
+        for word in words:
+            word, is_marked = self.parse_word(word)
+            row_len += pdf.get_string_width(word + ' ')
+            if is_marked:
+                # Keyword
+                pdf.set_text_color(255, 0, 0)
+            else:
+                # Not a keyword
+                pdf.set_text_color(0, 0, 0)
+            if row_len >= 185:
+                pdf.cell(pdf.get_string_width(word + ' '), 7, word, border=0, ln=1)
+                row_len = 10        # Reset length to left border
+            else:
+                pdf.cell(pdf.get_string_width(word + ' '), 7, word, border=0, ln=0)
+
+        pdf.set_text_color(0, 0, 0)     # Reset text color to black
+
+    def write_statistics(self, keywords, pdf):
+        pdf.set_x(55)
+        pdf.cell(50, 7, 'Keyword', border=1, ln=0, align='C')
+        pdf.cell(50, 7, 'Tần suất', border=1, ln=1, align='C')
+        for keyword, cnt in keywords.items():
+            pdf.set_x(55)
+            pdf.cell(50, 7, keyword.text, border=1, ln=0)
+            pdf.cell(50, 7, str(len(cnt)), border=1, ln=1, align='C')
+
+    @staticmethod
+    def parse_word(s):
+        if s.startswith('[color='):
+            return s[s.find('[b]') + 3:s.find('[/b]')], True
+        return s, False
+
+
+class PDF(FPDF):
+    def header(self):
+        # Logo
+        self.image(os.path.join(common.get_bundle_dir(), 'images', 'anydo_104098.png'), 10, 8, 20)
+        # Arial bold 15
+        self.set_font('Arial', 'B', 15)
+        # Move to the right
+        self.cell(80)
+        # Title
+        self.cell(30, 10, 'Record QC Report', 0, 0, 'C')
+        # Line break
+        self.ln(20)
+
+    # Page footer
+    def footer(self):
+        # Position at 1.5 cm from bottom
+        self.set_y(-15)
+        # Arial italic 8
+        self.set_font('Arial', 'I', 8)
+        # Page number
+        self.cell(0, 10, 'Page ' + str(self.page_no()) + '/{nb}', 0, 0, 'C')

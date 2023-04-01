@@ -25,6 +25,22 @@ class RootWidget(FloatLayout):
         self.btn_remove_all.bind(on_touch_up=self.cb_on_remove_all_up)
         self.btn_audio.bind(on_touch_up=self.cb_on_audio_up)
         self.btn_check.bind(on_touch_up=self.cb_on_check_up)
+        self.btn_export.bind(on_touch_up=self.cb_on_export_up)
+
+    def cb_on_export_up(self, instance, value):
+        if not instance.collide_point(*value.pos):
+            return
+
+        if not hasattr(self, 'qc_result') or not self.qc_result:
+            return
+
+        self.qc_result['filename'] = os.path.split(self.lbl_file.text)
+
+        result = App.get_running_app().controller.export_report(self.qc_result)
+        if result:
+            PopupMessage(message='Đã xuất ra {0}'.format(result)).open(animated=False)
+        else:
+            PopupMessage(message='Có lỗi xuất báo cáo').open(animated=False)
 
     def cb_on_add_up(self, instance, value):
         if not instance.collide_point(*value.pos):
@@ -150,7 +166,7 @@ class RootWidget(FloatLayout):
     def dismiss_popup(self):
         self._popup.dismiss()
 
-    def display_keywordQC_result(self, result):
+    def display_keyword_qc_result(self, result):
         self.img_load.size = (0, 0)
         self.btn_check.disabled = False
         self.btn_audio.disabled = False
@@ -170,8 +186,8 @@ class RootWidget(FloatLayout):
 
 
 class SpeechQCApp(App):
-    # mode = 'debug'
-    mode = 'production'
+    mode = 'debug'
+    # mode = 'production'
     icon = os.path.join(common.get_bundle_dir(), 'images', 'anydo_104098.png')
     title = 'Record QC'
 

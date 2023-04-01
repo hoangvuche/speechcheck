@@ -106,12 +106,14 @@ class Keywords:
             # Check keyword existence one by one
             result['keywords'][keyword] = [m.start() for m in re.finditer(keyword.text, transcript)]
 
+        # Save original transcript
+        result['original_transcript'] = result['transcript']
         # Mark found keywords
         for keyword, val in result['keywords'].items():
             result['transcript'] = self.check_keyword(keyword, val, result['transcript'])
 
         # Update UI
-        view.display_keywordQC_result(result)
+        view.display_keyword_qc_result(result)
 
     def check_keyword(self, keyword, positions, transcript):
         accumulated_spaces = 0
