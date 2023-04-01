@@ -1,14 +1,6 @@
-import sqlite3
-from os import path
 from threading import Thread
 
-from kivy.app import App
-from kivy.uix.floatlayout import FloatLayout
-from kivy.uix.gridlayout import GridLayout
 from kivy.uix.popup import Popup
-from kivy.properties import StringProperty
-from kivy.utils import get_color_from_hex
-from kivy.clock import Clock
 
 from controller import *
 from newwidgets import *
@@ -154,6 +146,7 @@ class RootWidget(FloatLayout):
         audio_type = common.is_valid_audio(filename[0])
 
         if not audio_type:
+            PopupMessage(message='Vui lòng chọn đúng file audio').open(animated=False)
             print('Invalid audio file')
             self.lbl_file.text = ''
             return
@@ -186,8 +179,8 @@ class RootWidget(FloatLayout):
 
 
 class SpeechQCApp(App):
-    mode = 'debug'
-    # mode = 'production'
+    # mode = 'debug'
+    mode = 'production'
     icon = os.path.join(common.get_bundle_dir(), 'images', 'anydo_104098.png')
     title = 'Record QC'
 

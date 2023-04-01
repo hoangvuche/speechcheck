@@ -1,15 +1,13 @@
-import os
 import datetime
+import os
 import time
+import wave
 from _thread import start_new_thread
 
+import mutagen
 from kivy.core.window import Window
 from kivy.graphics import Color, RoundedRectangle
-from kivy.utils import get_color_from_hex
 from kivy.metrics import dp
-
-import mutagen
-import wave
 
 
 def get_bundle_dir():

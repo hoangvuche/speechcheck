@@ -1,9 +1,7 @@
-import time
 import os
+import time
 
 import speech_recognition as sr
-from time import sleep
-
 from fpdf import FPDF
 
 import common
