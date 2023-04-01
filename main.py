@@ -81,7 +81,7 @@ class RootWidget(FloatLayout):
 
         self.popup_new_keyword = PopupWindow(self.add_key_content, use_buttons=False)
 
-        self.popup_new_keyword.open()
+        self.popup_new_keyword.open(animated=False)
 
     def on_size(self, instance, value):
         if hasattr(self, 'add_key_content'):
