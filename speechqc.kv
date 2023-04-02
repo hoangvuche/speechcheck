@@ -189,7 +189,7 @@ RootWidget:
 
                     Image:
                         id: img_load
-                        source: './images/loading.zip'
+                        source: path.join(common.get_bundle_dir(), 'images', 'loading.zip')
                         size_hint: None, None,
                         size: dp(0), dp(0)
                         pos_hint: {'center_x': .5, 'top': 1}
@@ -245,7 +245,7 @@ RootWidget:
         valign: 'middle'
     Image:
         id: img
-        source: './images/threedot.png'
+        source: path.join(common.get_bundle_dir(), 'images', 'threedot.png')
         size_hint: None, None
         size: dp(24), dp(24)
         pos_hint: {'x': (root.width - self.width) / root.width, 'center_y': .5}
