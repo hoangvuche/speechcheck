@@ -534,6 +534,23 @@
 #            pos: self.pos
 
 
+<Tooltip>:
+    size_hint: None, None
+    size: self.texture_size[0]+dp(5), self.texture_size[1]+dp(5)
+    color: 0, 0, 0, 1
+    canvas.before:
+        Color:
+            rgba: get_color_from_hex('#A9907E')
+        Rectangle:
+            size: self.size
+            pos: self.pos
+        Color:
+            rgba: get_color_from_hex('#e5eff1')
+        Rectangle:
+            size: self.width - dp(2), self.height - dp(2)
+            pos: self.x + dp(1), self.y + dp(1)
+
+
 FloatLayout:
     RoundedToggle:
         width: 44 * 2 * common.scale

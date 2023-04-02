@@ -101,6 +101,29 @@ class RoundedImageButton(ButtonBehavior, FloatLayout):
     padding_y = NumericProperty(0)
     padding = ReferenceListProperty(padding_x, padding_y)
     is_touched_down = False
+    tooltip_text = StringProperty('')
+
+    def __init__(self, **kwargs):
+        super(RoundedImageButton, self).__init__(**kwargs)
+        self.tooltip = Tooltip()
+        Window.bind(mouse_pos=self.on_mouse_pos)
+
+    def on_mouse_pos(self, *args):
+        if not self.get_root_window():
+            return
+        pos = args[1]
+        self.tooltip.pos = pos
+        Clock.unschedule(self.display_tooltip) # cancel scheduled event since I moved the cursor
+        self.close_tooltip() # close if it's opened
+        if self.collide_point(*self.to_widget(*pos)):
+            Clock.schedule_once(self.display_tooltip, 1)
+
+    def close_tooltip(self, *args):
+        Window.remove_widget(self.tooltip)
+
+    def display_tooltip(self, *args):
+        self.tooltip.text = self.tooltip_text
+        Window.add_widget(self.tooltip)
 
     def on_touch_down(self, touch):
         if self.collide_point(*touch.pos):
@@ -1162,6 +1185,10 @@ class BoxStencil(BoxLayout, StencilView):
 
 
 class FullImage(Image):
+    pass
+
+
+class Tooltip(Label):
     pass
 
 
