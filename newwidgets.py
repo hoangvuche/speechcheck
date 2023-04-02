@@ -31,14 +31,14 @@ import common
 
 class HorizontalSeparator(FloatLayout):
 
-    def __init__(self, height=common.element_sep * common.scale, **kwargs):
+    def __init__(self, height=common.element_sep, **kwargs):
         super(HorizontalSeparator, self).__init__(**kwargs)
         self.height = height
 
 
 class VerticalSeparator(FloatLayout):
 
-    def __init__(self, width=common.element_sep * common.scale, **kwargs):
+    def __init__(self, width=common.element_sep, **kwargs):
         super(VerticalSeparator, self).__init__(**kwargs)
         self.width = width
 
@@ -378,7 +378,7 @@ class PopupMessage(PopMenu):
 
     def __init__(self, message, width=None, height=dp(44 * 2), action='ok'):
         radius_val = dp(common.rounded_radius * 3)
-        sep = 1 * common.scale
+        sep = dp(1)
 
         content = PopupMenuContent(radius=[radius_val, radius_val])
         lbl_notification = MessageInfo(text=message,
@@ -386,13 +386,13 @@ class PopupMessage(PopMenu):
                                        width=(Window.width * .618) if width is None else width,
                                        height=height,
                                        radius=[radius_val, radius_val, 0, 0],
-                                       font_size=17 * common.scale)
+                                       font_size='17sp')
         self.btn_ok = RoundedButton(text='OK', size_hint=(None, None),
-                                    width=lbl_notification.width, height=56 * common.scale,
+                                    width=lbl_notification.width, height=dp(56),
                                     radius=[(0, 0), (0, 0),
                                             (radius_val, radius_val),
                                             (radius_val, radius_val)],
-                                    font_size=21 * common.scale,
+                                    font_size='21sp',
                                     bold=True,
                                     halign='center',
                                     color=get_color_from_hex('#0165ff'),
@@ -413,7 +413,7 @@ class PopupMessage(PopMenu):
                                             width=self.btn_ok.width, height=self.btn_ok.height,
                                             radius=[(0, 0), (0, 0), (0, 0),
                                                     (radius_val, radius_val)],
-                                            font_size=21 * common.scale,
+                                            font_size='21sp',
                                             halign='center',
                                             color=get_color_from_hex('#0165ff'),
                                             background_color_display=get_color_from_hex('#ebebeb'))
@@ -461,7 +461,7 @@ class PopupWindow(PopMenu):
 
     response = None
 
-    def __init__(self, panel, width=Window.width * .618, height=44 * 2 * common.scale, radius_val=dp(common.rounded_radius), use_buttons=True):
+    def __init__(self, panel, width=Window.width * .618, height=dp(44) * 2, radius_val=dp(common.rounded_radius), use_buttons=True):
         sep = dp(1)
 
         panel.bind(size=self.refresh, pos=self.refresh)
@@ -471,11 +471,11 @@ class PopupWindow(PopMenu):
         else:
             self.content = PopupMenuContent(radius=[radius_val, radius_val, radius_val, radius_val])
         self.btn_ok = RoundedButton(text='OK', size_hint=(None, None),
-                                width=(panel.width - sep) / 2, height=56 * common.scale,
+                                width=(panel.width - sep) / 2, height=dp(56),
                                 radius=[(0, 0), (0, 0),
                                         (radius_val, radius_val),
                                         (0, 0)],
-                                font_size=21 * common.scale,
+                                font_size='21sp',
                                 bold=True,
                                 halign='center',
                                 color=get_color_from_hex('#0165ff'),
@@ -486,7 +486,7 @@ class PopupWindow(PopMenu):
                                         radius=[(0, 0), (0, 0), (0, 0),
                                                 (radius_val,
                                                  radius_val)],
-                                        font_size=21 * common.scale,
+                                        font_size='21sp',
                                         halign='center',
                                         color=get_color_from_hex('#0165ff'),
                                         background_color_display=get_color_from_hex('#ebebeb'))
@@ -591,8 +591,8 @@ class Tag(FloatLayout):
         self.is_animation_progress = True
 
         self.tag_content.selected = value
-        if value and self.img_select.width < 24 * common.scale:
-            new_width = 24 * common.scale
+        if value and self.img_select.width < dp(24):
+            new_width = dp(24)
         else:
             new_width = 0
 
@@ -673,9 +673,9 @@ class RoundedTextInput(TextInput):
         if self.delete_display:
             x, y = touch.pos
             x1 = (self.x + self.width
-                  - (common.element_sep * common.scale)
-                  - 24 * common.scale
-                  - common.element_sep * 2 * common.scale)
+                  - (common.element_sep)
+                  - dp(24)
+                  - common.element_sep * 2)
             x2 = self.x + self.width
             y1 = self.y
             y2 = self.y + self.height
@@ -977,192 +977,6 @@ class ContextDialog(FloatLayout):
 class MiniTag(Label):
     background_color = ColorProperty(get_color_from_hex('#ffffff'))
     radius = ListProperty([0, 0])
-
-
-class RoundedToggle(FloatLayout):
-    background_color = ColorProperty(get_color_from_hex('#919090'))
-    background_select_color = ColorProperty(get_color_from_hex('#0000ff'))
-    icon_off = StringProperty(common.get_image_path('tag_grey.png'))
-    icon_on = StringProperty(common.get_image_path('tag_red.png'))
-    toggle_color_value = ColorProperty(get_color_from_hex('#ffffff'))
-    value = BooleanProperty(False)
-    disabled = BooleanProperty(False)
-    old_touch_pos = None
-    width = NumericProperty(44 * 2.5 * common.scale)
-    height = NumericProperty(44 * common.scale)
-    size_hint = ListProperty([None, None])
-    is_animation_in_progress = False
-    vibrator = BooleanProperty(False)
-
-    def __init__(self, **kwargs):
-        super(RoundedToggle, self).__init__(**kwargs)
-        self.bind(size=self.redraw, pos=self.redraw)
-        self.toggle_img = {False: self.icon_off, True: self.icon_on}
-
-    def on_icon_off(self, instance, value):
-        # Set toggle image (False) to icon_off
-        self.toggle_img = {False: value, True: self.icon_on}
-
-    def on_icon_on(self, instance, value):
-        # Set toggle image (True) to icon_on
-        self.toggle_img = {False: self.icon_off, True: value}
-
-    def redraw(self, *args):
-        try:
-            self.canvas.before.clear()
-
-            with self.canvas.before:
-                if not self.value:
-                    self.color = Color(rgba=self.background_color)
-                    toggle_pos_x = self.x
-                else:
-                    self.color = Color(rgba=self.background_select_color)
-                    toggle_pos_x = self.x + self.width - self.toggle_radius * 2
-
-                self.rect = RoundedRectangle(size=(self.width, self.height / 2),
-                                             pos=(self.pos[0], self.pos[1] + self.height / 4),
-                                             radius=[self.height / 4,])
-                self.toggle_color = Color(rgba=self.toggle_color_value)
-                self.toggle_radius = self.height / 2
-                self.toggle = RoundedRectangle(size=(self.height, self.height),
-                                               pos=(toggle_pos_x, self.y),
-                                               radius=[self.toggle_radius,])
-                self.img = Rectangle(source=self.toggle_img[self.value],
-                                     size=(self.height / 2, self.height / 2),
-                                     pos=(self.toggle.pos[0] + self.height / 4, self.toggle.pos[1] + self.height / 4))
-        except AttributeError:
-            pass
-
-    def on_touch_down(self, value):
-        if self.disabled:
-            # Do nothing if widget is disabled
-            return
-
-        if not self.collide_point(*value.pos):
-            return
-
-        self.old_touch_pos = value.pos
-
-        if self.vibrator and 'iphone' in platform.platform().lower():
-            vibrator.pattern([0, 2])
-
-    def on_touch_move(self, value):
-        if self.disabled:
-            # Do nothing if widget is disabled
-            return
-
-        if not self.collide_point(*value.pos):
-            # Do nothing if touch does not hover over widget
-            return
-
-        if not self.old_touch_pos:
-            # Initial touch down was outside of this widget
-            return
-
-        if common.get_gesture_type_horizontal(self.old_touch_pos, value.pos) == 'swipe_right':
-            # Move right according to touch pos
-            self.toggle.pos = (min(self.x + self.width - self.toggle_radius * 2,
-                                   self.toggle.pos[0] + common.get_move_distance_horizontal(self.old_touch_pos, value.pos)),
-                               self.toggle.pos[1])
-        elif common.get_gesture_type_horizontal(self.old_touch_pos, value.pos) == 'swipe_left':
-            # Move left according to touch pos
-            self.toggle.pos = (max(self.x,
-                                   self.toggle.pos[0] - common.get_move_distance_horizontal(self.old_touch_pos, value.pos)),
-                               self.toggle.pos[1])
-
-        # Set icon position
-        self.img.pos = (self.toggle.pos[0] + self.height / 4, self.toggle.pos[1] + self.height / 4)
-
-    def on_touch_up(self, value):
-        if self.disabled:
-            # Do nothing if widget is disabled
-            return
-
-        # Handle when user touch sliderhold instead of sliding
-        if self.old_touch_pos:
-            if not self.collide_point(*value.pos):
-                # Return because touch up outside widget
-                self.old_touch_pos = None  # Reset initial touch pos
-                self.move_completely()
-                return
-
-            if common.get_move_distance_horizontal(self.old_touch_pos, value.pos) < dp(5):
-                # Moving in a small distance is considered as a touch only
-                # Toggle value
-                if not self.is_animation_in_progress:
-                    self.value = not self.value
-                else:
-                    print('omit touch')
-            else:
-                # Moving distance is long enough to be a slide gesture
-                self.move_completely()
-        else:
-            # A slide gesture
-            self.move_completely()
-
-        self.old_touch_pos = None                   # Reset initial touch pos
-
-    def move_completely(self, base='pos'):
-        if base == 'pos':
-            if self.toggle.pos[0] < self.x + self.width / 2 - self.toggle_radius:
-                # Animate to the left
-                start_new_thread(self.slide_toggle, (self.toggle.pos[0], self.x))
-                self.color.rgba = self.background_color
-                self.value = False
-            else:
-                # Animate to the right
-                start_new_thread(self.slide_toggle, (self.toggle.pos[0], self.x + self.width - self.toggle_radius * 2))
-                self.color.rgba = self.background_select_color
-                self.value = True
-        elif base == 'value':
-            if self.value:
-                # Animate to the right
-                start_new_thread(self.slide_toggle, (self.toggle.pos[0], self.x + self.width - self.toggle_radius * 2))
-                self.color.rgba = self.background_select_color
-            else:
-                # Animate to the left
-                start_new_thread(self.slide_toggle, (self.toggle.pos[0], self.x))
-                self.color.rgba = self.background_color
-
-        self.img.source = self.toggle_img[self.value]
-        self.img.pos = (self.toggle.pos[0] + self.height / 4, self.toggle.pos[1] + self.height / 4)
-
-    def on_value(self, instance, value):
-        # Set corresponding icon
-        self.move_completely(base='value')
-
-    def slide_toggle(self, start, end, increment=10*common.scale, animation_time=.003):
-        # Turn animation flag on
-        self.is_animation_in_progress = True
-
-        x = None
-        if start < end:
-            # Animate to the right
-            while self.toggle.pos[0] < end:
-                new_x = min(self.toggle.pos[0] + increment, end)
-                if new_x != x:
-                    x = new_x
-                else:
-                    break
-
-                self.toggle.pos = (x, self.toggle.pos[1])
-                self.img.pos = (self.toggle.pos[0] + self.height / 4, self.toggle.pos[1] + self.height / 4)
-                time.sleep(animation_time)
-        else:
-            # Animate to the left
-            while self.toggle.pos[0] > end:
-                new_x = max(self.toggle.pos[0] - increment, end)
-                if new_x != x:
-                    x = new_x
-                else:
-                    break
-
-                self.toggle.pos = (x, self.toggle.pos[1])
-                self.img.pos = (self.toggle.pos[0] + self.height / 4, self.toggle.pos[1] + self.height / 4)
-                time.sleep(animation_time)
-
-        # Turn animation flag off
-        self.is_animation_in_progress = False
 
 
 class ThumbnailImage(Image):

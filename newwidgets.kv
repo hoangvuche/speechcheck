@@ -12,7 +12,7 @@
     text_size: self.size
     halign: 'center'
     valign: 'middle'
-    icon_pos_x: self.x + (self.width - 24 * common.scale) / 2 if self.icon_pos_hint == 'center' else (self.x + 24 * common.scale if self.icon_pos_hint == 'left' else ((self.x + self.width - (24 + 24) * common.scale) / self.width if self.text_pos_hint == 'right' else self.x + (self.width - 24 * common.scale) / 2))
+    icon_pos_x: self.x + (self.width - dp(24)) / 2 if self.icon_pos_hint == 'center' else (self.x + dp(24) if self.icon_pos_hint == 'left' else ((self.x + self.width - dp(24 + 24)) / self.width if self.text_pos_hint == 'right' else self.x + (self.width - dp(24)) / 2))
     canvas.before:
         Color:
             rgba: root.background_color_display
@@ -24,13 +24,13 @@
             rgba: 0, 0, 0, int(root.icon_display)
         Rectangle:
             source: root.icon
-            size: 24 * common.scale, 24 * common.scale
-            pos: self.icon_pos_x, self.y + (self.height - 24 * common.scale) / 2
+            size: dp(24), dp(24)
+            pos: self.icon_pos_x, self.y + (self.height - dp(24)) / 2
 
 
 <RoundedImageButton>:
 
-    icon_pos_x: self.x + (self.width - 24 * common.scale) / 2 if self.icon_pos_hint == 'center' else (self.x + 24 * common.scale if self.icon_pos_hint == 'left' else (self.x + self.width - (24 + 24) * common.scale if self.icon_pos_hint == 'right' else self.x + (self.width - 24 * common.scale) / 2))
+    icon_pos_x: self.x + (self.width - dp(24)) / 2 if self.icon_pos_hint == 'center' else (self.x + dp(24) if self.icon_pos_hint == 'left' else (self.x + self.width - dp(24 + 24) if self.icon_pos_hint == 'right' else self.x + (self.width - dp(24)) / 2))
 
     canvas.before:
         Color:
@@ -56,7 +56,7 @@
     Image:
         source: root.source
         size_hint: None, None
-        pos: root.icon_pos_x, root.y + (root.height - 24 * common.scale) / 2
+        pos: root.icon_pos_x, root.y + (root.height - dp(24)) / 2
         size: dp(24), dp(24)
 
 
@@ -94,8 +94,8 @@
     Image:
         id: img
         size_hint: None, .5
-        width: 24 * common.scale
-        pos_hint: {'right': (root.width - common.element_sep * common.scale) / root.width, 'center_y': .5}
+        width: dp(24)
+        pos_hint: {'right': (root.width - common.element_sep) / root.width, 'center_y': .5}
         source: common.get_image_path('dropdownicon.png')
 
 
@@ -121,15 +121,15 @@
             rgba: 1, 1, 1, int(root.header_image_display)
         Rectangle:
             source: root.header_image if len(self.header_image) else common.get_image_path('magnifier.png')
-            size: 24 * common.scale, 24 * common.scale
-            pos: self.x + common.element_sep * common.scale, self.y + (self.height - 24 * common.scale) / 2
+            size: dp(24), dp(24)
+            pos: self.x + common.element_sep, self.y + (self.height - dp(24)) / 2
 
         Color:
             rgba: 1, 1, 1, int(root.delete_display)
         Rectangle:
             source: common.get_image_path('delete.png')
-            size: 24 * common.scale, 24 * common.scale
-            pos: self.x + self.width - 24 * common.scale - common.element_sep * common.scale, self.y + (self.height - 24 * common.scale) / 2
+            size: dp(24), dp(24)
+            pos: self.x + self.width - dp(24) - common.element_sep, self.y + (self.height - dp(24)) / 2
 
 
 <BackgroundOneLineRoundedTextInput>:
@@ -156,7 +156,7 @@
         font_family: root.font_family
         pos_hint: {'x': 0, 'y': 0}
         padding_y: (self.height - self.line_height ) / 2, (self.height - self.line_height ) / 2
-        padding_x: max((24 + common.element_sep * 2) * common.scale, root.padding_x[0]) if root.header_image_display else root.padding_x[0], max((24 + common.element_sep * 3) * common.scale, root.padding_x[1]) if self.delete_display else root.padding_x[1]
+        padding_x: max((dp(24) + common.element_sep * 2), root.padding_x[0]) if root.header_image_display else root.padding_x[0], max((dp(24) + common.element_sep * 3), root.padding_x[1]) if self.delete_display else root.padding_x[1]
         on_focus: root.on_txt_focus(self, self.focus)
         radius: root.radius
         border_width: root.border_width
@@ -175,8 +175,8 @@
         id: search_magnifier
         source: common.get_image_path('magnifier.png')
         size_hint: None, None
-        size: 24 * common.scale, 24 * common.scale
-        pos_hint: {'x': (common.element_sep * common.scale) / root.width, 'center_y': .5}
+        size: dp(24), dp(24)
+        pos_hint: {'x': (common.element_sep) / root.width, 'center_y': .5}
         opacity: root.magnifier_opacity
 
 
@@ -201,7 +201,7 @@
         font_family: root.font_family
         pos_hint: {'x': 0, 'y': 0}
         padding_y: root.padding_y
-        padding_x: max(24 + common.element_sep * 2 * common.scale, root.padding_x[0]) if root.header_image_display else root.padding_x[0], max(24 + common.element_sep * 3 * common.scale, root.padding_x[1]) if self.delete_display else root.padding_x[1]
+        padding_x: max(dp(24) + common.element_sep * 2, root.padding_x[0]) if root.header_image_display else root.padding_x[0], max(dp(24) + common.element_sep * 3, root.padding_x[1]) if self.delete_display else root.padding_x[1]
         on_focus: root.on_txt_focus(self, self.focus)
         radius: root.radius
         border_width: root.border_width
@@ -239,7 +239,7 @@
         font_family: root.font_family
         pos_hint: {'x': 0, 'y': 0}
         padding_y: (self.height - self.line_height ) / 2, (self.height - self.line_height ) / 2
-        padding_x: max((24 + common.element_sep * 2) * common.scale, root.padding_x[0]) if root.header_image_display else root.padding_x[0], max((24 + common.element_sep * 3) * common.scale, root.padding_x[1]) if self.delete_display else root.padding_x[1]
+        padding_x: max((dp(24) + common.element_sep * 2), root.padding_x[0]) if root.header_image_display else root.padding_x[0], max((dp(24) + common.element_sep * 3), root.padding_x[1]) if self.delete_display else root.padding_x[1]
         on_focus: root.on_txt_focus(self, self.focus)
         radius: root.radius
         border_width: root.border_width
@@ -275,8 +275,8 @@
         text: root.text
         markup: True
         size_hint: None, 1
-        width: (self.parent.width - img_select.width - img_dots.width - common.element_sep * 6 * common.scale) if img_select.opacity else (self.parent.width - img_dots.width - common.element_sep * 5 * common.scale)
-        pos_hint: {'x': (((common.element_sep * 2 * common.scale + img_select.width + common.element_sep * common.scale) if img_select.opacity else (common.element_sep * 2 * common.scale)) / self.parent.width) if self.parent.width > 0 else 0, 'center_y': .5}
+        width: (self.parent.width - img_select.width - img_dots.width - common.element_sep * 6) if img_select.opacity else (self.parent.width - img_dots.width - common.element_sep * 5)
+        pos_hint: {'x': (((common.element_sep * 2 + img_select.width + common.element_sep) if img_select.opacity else (common.element_sep * 2)) / self.parent.width) if self.parent.width > 0 else 0, 'center_y': .5}
         text_size: self.size
         halign: 'left'
         valign: 'middle'
@@ -286,16 +286,16 @@
         id: img_dots
         source: common.get_image_path('threedots.png')
         size_hint: None, None
-        size: 24 * common.scale, 24 * common.scale
-        pos_hint: {'right': (self.parent.width - common.element_sep * 2 * common.scale) / self.parent.width if self.parent.width > 0 else 0, 'center_y': .5}
+        size: dp(24), dp(24)
+        pos_hint: {'right': (self.parent.width - common.element_sep * 2) / self.parent.width if self.parent.width > 0 else 0, 'center_y': .5}
         opacity: root.dots_opacity
         disabled: root.dots_disabled
     Image:
         id: img_select
         source: common.get_image_path('bluetick.png')
         size_hint: None, None
-        size: 0, 24 * common.scale
-        pos_hint: {'x': common.element_sep * 2 * common.scale / self.parent.width if self.parent.width > 0 else 0, 'center_y': .5}
+        size: 0, dp(24)
+        pos_hint: {'x': common.element_sep * 2 / self.parent.width if self.parent.width > 0 else 0, 'center_y': .5}
         opacity: int(root.select) if root.use_select else 0
 
 
@@ -305,7 +305,7 @@
             rgba: 1, 1, 1, int(self.select)
         Rectangle:
             source: common.get_image_path('bluetick.png')
-            size: 24 * common.scale, 24 * common.scale
+            size: dp(24), dp(24)
             pos: self.x + self.width - dp(24 + 12), self.y + dp(12)
         Color:
             rgba: 1, 1, 1, int(self.delete)
@@ -327,7 +327,7 @@
             id: lbl_text
             text: root.text
             size_hint: 1, None
-            height: 44 * common.scale
+            height: dp(44)
             text_size: self.size
             halign: 'center'
             valign: 'middle'
@@ -352,7 +352,7 @@
             orientation: 'lr-tb'
             size_hint: 1, None
             height: root.tag_lines * dp(22)
-            spacing: [common.element_sep / 2 * common.scale, common.element_sep / 4 * common.scale]
+            spacing: [common.element_sep / 2, common.element_sep / 4]
 
 
 <ContextDialog>:
@@ -367,7 +367,7 @@
         RoundedRectangle:
             size: self.size
             pos: self.pos
-            radius: [(common.rounded_radius * 2 * common.scale,), (common.rounded_radius * 2 * common.scale,), (0,), (0,)]
+            radius: [(common.rounded_radius * 2,), (common.rounded_radius * 2,), (0,), (0,)]
 
 
 <PopupMenuContent>:
@@ -434,7 +434,7 @@
 
     text: root.text
     size_hint: None, None
-    size: self.texture_size[0] + common.element_sep * common.scale, self.texture_size[1]
+    size: self.texture_size[0] + common.element_sep, self.texture_size[1]
     pos_hint: root.pos_hint
     halign: 'center'
     color: root.color
@@ -448,9 +448,9 @@
         id: txt
         text: str(root.value)
         size_hint: None, None
-        width: max(44 * common.scale, len(self.text) * self.font_size * common.scale)
-        height: 44 * common.scale
-        pos_hint: {'x': (common.element_sep * 2 * common.scale) / self.parent.width, 'center_y': .5}
+        width: max(dp(44), len(self.text) * self.font_size)
+        height: dp(44)
+        pos_hint: {'x': (common.element_sep * 2) / self.parent.width, 'center_y': .5}
         border_width: root.border_width
         radius: root.radius
         foreground_color: root.foreground_color
@@ -473,15 +473,15 @@
     Slider:
         id: slider
         size_hint: None, None
-        width: root.width - txt.width - common.element_sep * 5 * common.scale
-        height: 44 * common.scale
+        width: root.width - txt.width - common.element_sep * 5
+        height: dp(44)
         step: root.step
         min: root.min
         max: root.max
         value: root.value
         value_track: root.value_track
         value_track_color: root.value_track_color
-        pos_hint: {'x': (txt.width + common.element_sep * 3 * common.scale) / root.width, 'center_y': .5}
+        pos_hint: {'x': (txt.width + common.element_sep * 3) / root.width, 'center_y': .5}
         on_value: root.on_slider_value(*args)
 
 
@@ -549,12 +549,3 @@
         Rectangle:
             size: self.width - dp(2), self.height - dp(2)
             pos: self.x + dp(1), self.y + dp(1)
-
-
-FloatLayout:
-    RoundedToggle:
-        width: 44 * 2 * common.scale
-        height: 44 * .75 * common.scale
-        icon_off: common.get_image_path('white_theme.png')
-        icon_on: common.get_image_path('dark_theme.png')
-        pos_hint: {'center_x': .5, 'center_y': .5}

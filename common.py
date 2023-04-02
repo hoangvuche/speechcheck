@@ -92,34 +92,17 @@ def get_scale(iphone):
     return in_scale
 
 
-device = get_device_name()
-padding_y = get_padding_y(device)
-scale = get_scale(device)
+padding_y = (0, 0)
 element_sep = dp(8)
 bottom_sep = dp(12)
 rounded_radius = dp(5)
 animation_time = .003
 is_animation_in_progress = False
-pnl_search_height = 56 * scale
-txt_search_height = 44 * scale
-lbl_search_cancel_height = 56 * scale
-icon_height = 24 * scale
+pnl_search_height = dp(56)
+txt_search_height = dp(44)
+lbl_search_cancel_height = dp(56)
+icon_height = dp('24')
 default_bgr = '4.png'
-
-
-def get_image_path(filename, image_type='icon'):
-    global scale
-
-    if image_type == 'icon':
-        head, tail = os.path.splitext(filename)
-        if scale == 1:
-            return os.path.join(get_bundle_dir(), 'assets', filename)
-        elif scale == 2:
-            return os.path.join(get_bundle_dir(), 'assets', ''.join((head, '@2x', tail)))
-        else:
-            return os.path.join(get_bundle_dir(), 'assets', ''.join((head, '@3x', tail)))
-    elif image_type == 'background':
-        return os.path.join(get_bundle_dir(), 'assets', 'background', filename)
 
 
 def hide_widget(wid, dohide=True):
@@ -195,15 +178,15 @@ def fade_widget(wid, dofade=True):
         fade_color = (0.9529411764705882, 0.9450980392156862, 0.9607843137254902, .7)
         with wid.canvas.after:
             Color(*fade_color)
-            wid.fade_rect = RoundedRectangle(size=(wid.width + element_sep * scale,
-                                                   wid.height + element_sep * scale),
-                                             pos=(wid.x - element_sep * scale,
-                                                  wid.y - element_sep * scale),
-                                             radius=((wid.width + element_sep * scale) / 2,
-                                                     (wid.height + element_sep * scale) / 2))
+            wid.fade_rect = RoundedRectangle(size=(wid.width + dp(element_sep),
+                                                   wid.height + dp(element_sep)),
+                                             pos=(wid.x - dp(element_sep),
+                                                  wid.y - dp(element_sep)),
+                                             radius=((wid.width + dp(element_sep)) / 2,
+                                                     (wid.height + dp(element_sep)) / 2))
 
 
-def is_touch_around_label(wid, touch, around_space=12*scale):
+def is_touch_around_label(wid, touch, around_space=dp(12)):
     """
     Judge whether user touches around Done label
     :param wid: widget to check around touch
@@ -227,7 +210,7 @@ def is_touch_around_label(wid, touch, around_space=12*scale):
     return is_point_inside_rectangle(x1, y1, x2, y2, *touch.pos)
 
 
-def is_touch_around_wid(wid, touch, around_space=12*scale):
+def is_touch_around_wid(wid, touch, around_space=dp(12)):
     """
     Judge whether user touches around Done label
     :param wid: widget to check around touch
@@ -303,7 +286,7 @@ def get_move_distance_horizontal(pos1, pos2):
     return abs(x2 - x1)
 
 
-def slide_attribute(wid, attribute, start, end, increment=1*scale, callback=None, animation_time=.003, check_conflict=True):
+def slide_attribute(wid, attribute, start, end, increment=dp(1), callback=None, animation_time=.003, check_conflict=True):
     """
 
     :param wid:
