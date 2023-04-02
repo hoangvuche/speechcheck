@@ -277,6 +277,9 @@ class AddNewKeywordPanel(MessagePanel):
         if self.keyword:
             self.old_keyword = keyword
 
+            # Disable button save
+            self.btn_save.disabled = True
+
 
 class LoadDialog(FloatLayout):
     load = ObjectProperty(None)
