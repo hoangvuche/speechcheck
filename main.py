@@ -75,6 +75,7 @@ class RootWidget(FloatLayout):
 
         self.img_load.size = (dp(48), dp(48))
         self.lbl_transcript.text = ''
+        self.grd_report.clear_widgets()
 
     def show_add_keyword(self, keyword=None):
         self.add_key_content = AddNewKeywordPanel(width=self.width * .5, height=dp(44) * 3,
