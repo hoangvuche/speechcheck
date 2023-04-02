@@ -97,7 +97,8 @@ class QCController:
             out_file = ''.join((os.path.splitext(content['filename'][1])[0], '.pdf'))
             pdf.output(out_file, 'F')
             return out_file
-        except Exception:
+        except Exception as e:
+            print(e)
             return False
 
     def write_conversation(self, s, pdf):
@@ -125,9 +126,15 @@ class QCController:
         pdf.cell(50, 7, 'Keyword', border=1, ln=0, align='C')
         pdf.cell(50, 7, 'Tần suất', border=1, ln=1, align='C')
         for keyword, cnt in keywords.items():
-            pdf.set_x(55)
+            # Set text color based on frequency
+            frequency = len(cnt)
+            color = (255, 0, 0) if frequency else (0, 0, 0)
+            pdf.set_text_color(*color)
+
+            pdf.set_x(55)       # Move to start pos of writing keyword cell
             pdf.cell(50, 7, keyword.text, border=1, ln=0)
-            pdf.cell(50, 7, str(len(cnt)), border=1, ln=1, align='C')
+            pdf.cell(50, 7, str(frequency), border=1, ln=1, align='C')
+        pdf.set_text_color(0, 0, 0)     # Set text color to black as normal
 
     @staticmethod
     def parse_word(s):
