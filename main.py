@@ -146,7 +146,7 @@ class RootWidget(FloatLayout):
             self.lbl_file.text = filename[0]
         else:
             # Debug mode
-            self.lbl_file.text = os.path.join('.', 'speech1.wav')
+            self.lbl_file.text = os.path.join('.', 'sample records', 'speech1.wav')
 
         # Check audio file or otherwise
         audio_type = common.is_valid_audio(filename[0])
@@ -177,16 +177,17 @@ class RootWidget(FloatLayout):
     def draw_qc_result(self, value):
         self.grd_report.bind(minimum_height=self.grd_report.setter('height'))
         self.grd_report.add_widget(CellItem(description='Keyword', frequency='Tần suất', is_header=True))
-        cnt = 0
+        total = 0
         for key, val in self.qc_result['keywords'].items():
-            cnt += 1
-            self.grd_report.add_widget(CellItem(description=key.text, frequency=str(len(val)),
-                                                is_last=True if cnt == len(self.qc_result['keywords'].keys()) else False))
+            total += len(val)       # Add to total compromise
+            self.grd_report.add_widget(CellItem(description=key.text, frequency=str(len(val))))
+        self.grd_report.add_widget(CellItem(description='TỔNG CỘNG', frequency=str(total),
+                                            is_header=True, is_last=True))
 
 
 class SpeechQCApp(App):
-    # mode = 'debug'
-    mode = 'production'
+    mode = 'debug'
+    # mode = 'production'
     icon = os.path.join(common.get_bundle_dir(), 'images', 'anydo_104098.png')
     title = 'Record QC'
 

@@ -36,7 +36,7 @@ class QCController:
         self.keywords.remove_all(self.view)
 
     def transcribe_audio(self, file):
-        print('Checking TC record')
+        print('Checking record')
         audio_file = file
 
         # use the audio file as the audio source
@@ -125,15 +125,27 @@ class QCController:
         pdf.set_x(55)
         pdf.cell(50, 7, 'Keyword', border=1, ln=0, align='C')
         pdf.cell(50, 7, 'Tần suất', border=1, ln=1, align='C')
+        total = 0
+        iter_cnt = 0
         for keyword, cnt in keywords.items():
             # Set text color based on frequency
             frequency = len(cnt)
+            total += frequency
             color = (255, 0, 0) if frequency else (0, 0, 0)
             pdf.set_text_color(*color)
 
             pdf.set_x(55)       # Move to start pos of writing keyword cell
             pdf.cell(50, 7, keyword.text, border=1, ln=0)
             pdf.cell(50, 7, str(frequency), border=1, ln=1, align='C')
+
+            iter_cnt += 1
+
+            # Write total row
+            if iter_cnt == len(keywords):
+                pdf.set_x(55)  # Move to start pos of writing keyword cell
+                pdf.cell(50, 7, 'TỔNG CỘNG', border=1, ln=0)
+                pdf.cell(50, 7, str(total), border=1, ln=1, align='C')
+
         pdf.set_text_color(0, 0, 0)     # Set text color to black as normal
 
     @staticmethod
