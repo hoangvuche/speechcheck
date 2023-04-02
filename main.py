@@ -1,3 +1,8 @@
+import os
+import sys
+if sys.__stdout__ is None or sys.__stderr__ is None:
+    os.environ['KIVY_NO_CONSOLELOG'] = '1'
+
 from threading import Thread
 
 from kivy.uix.popup import Popup
