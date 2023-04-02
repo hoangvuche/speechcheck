@@ -186,8 +186,8 @@ class RootWidget(FloatLayout):
 
 
 class SpeechQCApp(App):
-    mode = 'debug'
-    # mode = 'production'
+    # mode = 'debug'
+    mode = 'production'
     icon = os.path.join(common.get_bundle_dir(), 'images', 'anydo_104098.png')
     title = 'Record QC'
 
