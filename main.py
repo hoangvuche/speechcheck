@@ -215,28 +215,32 @@ class KeywordItem(FloatLayout):
 
     def cb_on_touch_up(self, touch, value):
         if self.img.collide_point(*value.pos):
-            btnEdit = RoundedButton(text='Sửa',
-                                    size_hint=(None, None),
-                                    width=dp(200), height=dp(44),
-                                    radius=[(common.rounded_radius, common.rounded_radius),
-                                            (common.rounded_radius, common.rounded_radius),
-                                            (0, 0), (0, 0)],
-                                    font_size='15sp',
-                                    halign='center',
-                                    padding_x=common.element_sep * 2,
-                                    color=get_color_from_hex('#000000'),
-                                    background_color_display=get_color_from_hex('#f3f4f5'))
-            btnRemove = RoundedButton(text='Xóa',
-                                    size_hint=(None, None),
-                                    width=dp(200), height=dp(44),
-                                    radius=[(0, 0), (0, 0),
-                                            (common.rounded_radius, common.rounded_radius),
-                                            (common.rounded_radius, common.rounded_radius)],
-                                    font_size='15sp',
-                                    halign='center',
-                                    padding_x=common.element_sep * 2,
-                                    color=get_color_from_hex('#000000'),
-                                    background_color_display=get_color_from_hex('#f3f4f5'))
+            btnEdit = RoundedImageButton(text='Sửa',
+                                         source=os.path.join(common.get_bundle_dir(), 'images', 'edit.png'),
+                                         icon_pos_hint='left',
+                                         size_hint=(None, None),
+                                         width=dp(200), height=dp(44),
+                                         radius=[(common.rounded_radius, common.rounded_radius),
+                                                 (common.rounded_radius, common.rounded_radius),
+                                                 (0, 0), (0, 0)],
+                                         font_size='15sp',
+                                         halign='center',
+                                         padding_x=common.element_sep * 2,
+                                         color=get_color_from_hex('#000000'),
+                                         background_color_display=get_color_from_hex('#f3f4f5'))
+            btnRemove = RoundedImageButton(text='Xóa',
+                                           source=os.path.join(common.get_bundle_dir(), 'images', 'remove.png'),
+                                           icon_pos_hint='left',
+                                           size_hint=(None, None),
+                                           width=dp(200), height=dp(44),
+                                           radius=[(0, 0), (0, 0),
+                                                   (common.rounded_radius, common.rounded_radius),
+                                                   (common.rounded_radius, common.rounded_radius)],
+                                           font_size='15sp',
+                                           halign='center',
+                                           padding_x=common.element_sep * 2,
+                                           color=get_color_from_hex('#000000'),
+                                           background_color_display=get_color_from_hex('#f3f4f5'))
 
             btnEdit.bind(on_touch_up=self.cb_on_edit_touch_up)
             btnRemove.bind(on_touch_up=self.cb_on_remove_touch_up)
