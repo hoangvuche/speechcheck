@@ -10,12 +10,24 @@ from keys import *
 
 class QCController:
 
-    def __init__(self, keywords, view):
-        # Model
+    def __init__(self, activation, keywords, view):
+        # Activation Model
+        self.activation = activation
+
+        # Keyword Model
         self.keywords = keywords
 
         # View
         self.view = view
+
+    def check_activation(self):
+        self.activation.check_activation(self.view)
+
+    def validate_info(self, contact):
+        self.activation.validate_info(contact, self.view)
+
+    def verify_credential(self, key):
+        self.activation.verify_credential(key, self.view)
 
     def refresh_keywords(self):
         self.keywords.refresh(self.view)

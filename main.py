@@ -9,6 +9,7 @@ from kivy.uix.popup import Popup
 
 from controller import *
 from newwidgets import *
+from activation import *
 
 
 class RootWidget(FloatLayout):
@@ -85,9 +86,18 @@ class RootWidget(FloatLayout):
         self.add_key_content.btn_save_close.bind(on_press=self.cb_on_save_close_press)
         self.add_key_content.btn_close.bind(on_press=self.cb_on_close_press)
 
-        self.popup_new_keyword = PopupWindow(self.add_key_content, use_buttons=False)
+        self.popup_dialog = PopupWindow(self.add_key_content, use_buttons=False)
 
-        self.popup_new_keyword.open(animated=False)
+        self.popup_dialog.open(animated=False)
+
+    def show_activation(self):
+        self.activation_content = ActivationDialog(width=self.width * .5, height=dp(44) * 3)
+        self.activation_content.btn_save.bind(on_press=self.on_activation_save_press)
+        self.activation_content.btn_close.bind(on_press=self.on_activation_close_press)
+
+        self.popup_dialog = PopupWindow(self.activation_content, use_buttons=False)
+
+        self.popup_dialog.open(animated=False)
 
     def on_size(self, instance, value):
         if hasattr(self, 'add_key_content'):
@@ -97,9 +107,36 @@ class RootWidget(FloatLayout):
         self.save_keywords()
         self.add_key_content.txt_keyword.text = ''
 
+    def on_activation_save_press(self, instance):
+        contact = self.activation_content.txt_keyword.text.strip()
+        if len(contact) == 0:
+            return
+
+        if instance.text == 'Tiếp tục':
+            # Send info to admin
+            App.get_running_app().controller.validate_info(contact)
+            # Adjust screen accordingly
+            self.activation_content.txt_keyword.text = ''
+            self.activation_content.txt_keyword.hint_text = 'Hỏi quản lý để lấy key kích hoạt'
+            instance.text = 'Kích hoạt'
+        else:
+            # Verify activation key
+            App.get_running_app().controller.verify_credential(self.activation_content.txt_keyword.text)
+
+    def on_activation_close_press(self, instance):
+        App.get_running_app().stop()
+
+    def process_credential(self, activated):
+        if activated:
+            self.popup_dialog.dismiss()
+        else:
+            self.activation_content.txt_keyword.text = ''
+            self.activation_content.txt_keyword.hint_text = 'Nhập email hoặc số điện thoại để kích hoạt'
+            self.activation_content.btn_save.text = 'Tiếp tục'
+
     def cb_on_save_close_press(self, instance):
         self.save_keywords()
-        self.popup_new_keyword.dismiss()
+        self.popup_dialog.dismiss()
 
     def save_keywords(self, mode='add'):
         if self.add_key_content.txt_keyword.text.strip() == '':
@@ -125,7 +162,7 @@ class RootWidget(FloatLayout):
             App.get_running_app().controller.save_keywords(keywords)
 
     def cb_on_close_press(self, instance):
-        self.popup_new_keyword.dismiss()
+        self.popup_dialog.dismiss()
 
     def refresh(self, keywords):
         self.grd_keywords.clear_widgets()
@@ -133,6 +170,10 @@ class RootWidget(FloatLayout):
         for keyword in keywords:
             keyitem = KeywordItem(text=keyword.text)
             self.grd_keywords.add_widget(keyitem)
+
+    def activate(self, is_activated):
+        if not is_activated:
+            self.show_activation()
 
     def show_media(self):
         content = LoadDialog(load=self.load_media_file, cancel=self.dismiss_popup)
@@ -193,8 +234,10 @@ class SpeechQCApp(App):
 
     def on_start(self):
         self.get_db_connection()
+        self.activation = Activation()
         self.keywords = Keywords()
-        self.controller = QCController(self.keywords, self.root)
+        self.controller = QCController(self.activation, self.keywords, self.root)
+        self.controller.check_activation()
         self.controller.refresh_keywords()
         self.root.bind_all()
 
@@ -286,6 +329,10 @@ class AddNewKeywordPanel(MessagePanel):
 
             # Disable button save
             self.btn_save.disabled = True
+
+
+class ActivationDialog(MessagePanel):
+    text = StringProperty('')
 
 
 class LoadDialog(FloatLayout):

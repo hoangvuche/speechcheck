@@ -296,6 +296,49 @@ RootWidget:
         width: dp(4)
         pos_hint: {'right': 1, 'y': 0}
 
+
+<ActivationDialog>:
+    txt_keyword: txt_keyword
+    btn_save: btnSave
+    btn_close: btnClose
+
+    size_hint: None, None
+    width: root.width
+    height: root.height
+    radius: common.rounded_radius, common.rounded_radius, common.rounded_radius, common.rounded_radius
+
+    VerticalSeparator:
+        id: sep_left
+        width: dp(4)
+        pos_hint: {'x': 0, 'y': 0}
+
+    TextInput:
+        id: txt_keyword
+        size_hint: 0 if not root.width else (root.width - sep_left.width - sep_right.width) / root.width, None
+        height: dp(44)
+        pos_hint: {'center_x': .5, 'y': 0 if root.height == 0 else dp(68) / root.height}
+        hint_text: 'Nhập email hoặc số điện thoại để kích hoạt'
+        text: root.text
+
+    GridLayout:
+        cols: 2
+        size_hint: (0 if not root.width else (root.width - sep_left.width - sep_right.width) / root.width, None)
+        height: dp(44)
+        pos_hint: {'x': 0, 'y':  0 if root.height == 0 else dp(12) / root.height}
+
+        Button:
+            id: btnSave
+            text: 'Tiếp tục'
+        Button:
+            id: btnClose
+            text: 'Thoát'
+
+    VerticalSeparator:
+        id: sep_right
+        width: dp(4)
+        pos_hint: {'right': 1, 'y': 0}
+
+
 <LoadDialog>:
     BoxLayout:
         size: root.size
