@@ -279,7 +279,7 @@ RootWidget:
         cols: 3
         size_hint: (0 if not root.width else (root.width - sep_left.width - sep_right.width) / root.width, None)
         height: dp(44)
-        pos_hint: {'x': .5, 'y':  0 if root.height == 0 else dp(12) / root.height}
+        pos_hint: {'center_x': .5, 'y':  0 if root.height == 0 else dp(12) / root.height}
 
         Button:
             id: btn_save
