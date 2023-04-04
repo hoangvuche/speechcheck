@@ -115,13 +115,16 @@ class RootWidget(FloatLayout):
         if instance.text == 'Tiếp tục':
             # Send info to admin
             App.get_running_app().controller.validate_info(contact)
-            # Adjust screen accordingly
-            self.activation_content.txt_keyword.text = ''
-            self.activation_content.txt_keyword.hint_text = 'Hỏi quản lý để lấy key kích hoạt'
-            instance.text = 'Kích hoạt'
         else:
             # Verify activation key
             App.get_running_app().controller.verify_credential(self.activation_content.txt_keyword.text)
+
+    def after_validate_info(self, success):
+        if success:
+            # Adjust screen accordingly
+            self.activation_content.txt_keyword.text = ''
+            self.activation_content.txt_keyword.hint_text = 'Hỏi quản lý để lấy key kích hoạt'
+            self.activation_content.btn_save.text = 'Kích hoạt'
 
     def on_activation_close_press(self, instance):
         App.get_running_app().stop()

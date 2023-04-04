@@ -253,9 +253,9 @@ RootWidget:
 
 <AddNewKeywordPanel>:
     txt_keyword: txt_keyword
-    btn_save: btnSave
-    btn_save_close: btnSaveClose
-    btn_close: btnClose
+    btn_save: btn_save
+    btn_save_close: btn_save_close
+    btn_close: btn_close
 
     size_hint: None, None
     width: root.width
@@ -279,16 +279,16 @@ RootWidget:
         cols: 3
         size_hint: (0 if not root.width else (root.width - sep_left.width - sep_right.width) / root.width, None)
         height: dp(44)
-        pos_hint: {'x': 0, 'y':  0 if root.height == 0 else dp(12) / root.height}
+        pos_hint: {'x': .5, 'y':  0 if root.height == 0 else dp(12) / root.height}
 
         Button:
-            id: btnSave
+            id: btn_save
             text: 'Lưu'
         Button:
-            id: btnSaveClose
+            id: btn_save_close
             text: 'Lưu và thoát'
         Button:
-            id: btnClose
+            id: btn_close
             text: 'Thoát'
 
     VerticalSeparator:
@@ -299,8 +299,8 @@ RootWidget:
 
 <ActivationDialog>:
     txt_keyword: txt_keyword
-    btn_save: btnSave
-    btn_close: btnClose
+    btn_save: btn_save
+    btn_close: btn_close
 
     size_hint: None, None
     width: root.width
@@ -324,13 +324,13 @@ RootWidget:
         cols: 2
         size_hint: (0 if not root.width else (root.width - sep_left.width - sep_right.width) / root.width, None)
         height: dp(44)
-        pos_hint: {'x': 0, 'y':  0 if root.height == 0 else dp(12) / root.height}
+        pos_hint: {'center_x': .5, 'y':  0 if root.height == 0 else dp(12) / root.height}
 
         Button:
-            id: btnSave
+            id: btn_save
             text: 'Tiếp tục'
         Button:
-            id: btnClose
+            id: btn_close
             text: 'Thoát'
 
     VerticalSeparator:

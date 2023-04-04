@@ -15,11 +15,16 @@ class Activation:
         receiver_email = "hoangvu.che@gmail.com"  # Enter receiver address
         password = 'dhf28xK7JA'
 
-        context = ssl.create_default_context()
-        with smtplib.SMTP_SSL(smtp_server, port, context=context) as server:
-            server.login(sender_email, password)
-            server.sendmail(sender_email, receiver_email, message)
-        print('Sent mail successfully')
+        try:
+            context = ssl.create_default_context()
+            with smtplib.SMTP_SSL(smtp_server, port, context=context) as server:
+                server.login(sender_email, password)
+                server.sendmail(sender_email, receiver_email, message)
+            print('Sent mail successfully')
+            return True
+        except Exception as e:
+            print(e)
+        return False
 
     @staticmethod
     def read_hd_serial():
@@ -43,7 +48,8 @@ class Activation:
         User: {}""".format(self.read_hd_serial(), contact)
         message = 'Subject: {}\n\n{}'.format(subject, content)
         self.contact = contact
-        self.send_mail(message)
+        success = self.send_mail(message)
+        view.after_validate_info(success)
 
     def verify_credential(self, key, view):
         expected_key = self.create_activation_key(self.read_hd_serial() + self.contact)
