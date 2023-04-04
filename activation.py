@@ -12,7 +12,7 @@ class Activation:
         port = 465  # For SSL
         smtp_server = "mail9051.maychuemail.com"
         sender_email = "no-reply@plusdebt.asia"  # Enter your address
-        receiver_email = "hoangvu.che@gmail.com"  # Enter receiver address
+        receiver_email = "no-reply@plusdebt.asia"  # Enter receiver address
         password = 'dhf28xK7JA'
 
         try:
