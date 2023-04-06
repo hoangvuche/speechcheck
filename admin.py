@@ -178,10 +178,11 @@ class RecordQCAdmin:
 
 
 if __name__ == '__main__':
+    print('Type ".quit" to stop service')
     admin = RecordQCAdmin()
     admin.run()
-    ans = 'n'
-    while ans.lower() != 'y':
-        ans = input('\nStop service? [y/n]: ')
+    ans = ''
+    while ans.lower() != '.quit':
+        ans = input('> ')
     # Stop service
     admin.as_service = False
