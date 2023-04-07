@@ -174,7 +174,7 @@ class RecordQCAdmin:
         print('Listening to activation requests..')
         while self.as_service:
             self.generate_keys(self.check_mail())
-            time.sleep(1)
+            time.sleep(30)
 
 
 if __name__ == '__main__':
@@ -182,7 +182,7 @@ if __name__ == '__main__':
     admin = RecordQCAdmin()
     admin.run()
     ans = ''
-    while ans.lower() != '.quit':
+    while ans.lower().strip() != '.quit':
         ans = input('> ')
     # Stop service
     admin.as_service = False
