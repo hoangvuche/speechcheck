@@ -58,25 +58,25 @@ class RootWidget(FloatLayout):
     def cb_on_check_up(self, instance, value):
         if not instance.collide_point(*value.pos) or instance.disabled:
             return
-        if self.lbl_file.text == '':
-            print('No file selected')
+        if self.lbl_files.text == '':
+            print('No files selected')
             return
-        if hasattr(self, 'thread_transcription'):
-            if self.thread_transcription.is_alive():
-                print('Another thread is running, please wait!')
-                return
+        if hasattr(self, 'thread_transcription') and self.thread_transcription.is_alive():
+            print('Another thread is running, please wait!')
+            return
 
         instance.disabled = True
         self.btn_audio.disabled = True
 
-        self.thread_transcription = Thread(target=App.get_running_app().controller.transcribe_audio,
-                                           name='thread_transcription',
-                                           args=(self.lbl_file.text,))
-        self.thread_transcription.start()
+        self.qc_result = []
 
         self.img_load.size = (dp(48), dp(48))
-        self.lbl_transcript.text = ''
-        self.grd_report.clear_widgets()
+        self.pnl_result.clear_widgets()
+
+        self.thread_transcription = Thread(target=App.get_running_app().controller.transcribe_audios,
+                                           name='thread_transcription',
+                                           args=(self.record_files,))
+        self.thread_transcription.start()
 
     def show_add_keyword(self, keyword=None):
         self.add_key_content = AddNewKeywordPanel(width=self.width * .5, height=dp(44) * 3,
@@ -185,24 +185,31 @@ class RootWidget(FloatLayout):
         self._popup.open()
 
     def load_media_file(self, path, filename):
+        # Save selected file in a variable
+        self.record_files = filename
+
         if App.get_running_app().mode == 'production':
             # Production mode
-            self.lbl_file.text = filename[0]
+            # self.lbl_file.text = filename[0]
+            self.lbl_files.text = '\n'.join(filename)
         else:
             # Debug mode
-            self.lbl_file.text = os.path.join('.', 'sample records', 'speech1.wav')
+            # self.lbl_file.text = os.path.join('.', 'sample records', 'speech1.wav')
+            self.lbl_files.text = '\n'.join((os.path.join('.', 'sample records', 'speech1.wav'),
+                                            os.path.join('.', 'sample records', 'test.wav')))
 
         # Check audio file or otherwise
-        audio_type = common.is_valid_audio(filename[0])
+        for f in filename:
+            audio_type = common.is_valid_audio(f)
 
-        if not audio_type:
-            PopupMessage(message='Vui lòng chọn đúng file audio').open(animated=False)
-            print('Invalid audio file')
-            self.lbl_file.text = ''
-            return
-        else:
-            # Audio file, start thread load audio
-            print('Valid audio file')
+            if not audio_type:
+                PopupMessage(message=f'{f} không phải file Audio').open(animated=False)
+                print(f'Invalid audio file: {f}')
+                self.lbl_files.text = ''
+                return
+            else:
+                # Audio file, start thread load audio
+                print(f'Valid audio file: {f}')
 
         self.dismiss_popup()
 
@@ -210,28 +217,23 @@ class RootWidget(FloatLayout):
         self._popup.dismiss()
 
     def display_keyword_qc_result(self, result):
-        self.img_load.size = (0, 0)
-        self.btn_check.disabled = False
-        self.btn_audio.disabled = False
-        self.lbl_transcript.text = result['transcript']
-
-        self.qc_result = result
-        Clock.schedule_once(self.draw_qc_result, -1)
+        self.img_load.size = (0, 0)                 # Hide loading image
+        self.btn_check.disabled = False             # Enable button check record
+        self.btn_audio.disabled = False             # Enable button audio selection
+        self.qc_result.append(result)                       # Store result to a list
+        Clock.schedule_once(self.draw_qc_result, -1)        # Draw statistics
 
     def draw_qc_result(self, value):
-        self.grd_report.bind(minimum_height=self.grd_report.setter('height'))
-        self.grd_report.add_widget(CellItem(description='Keyword', frequency='Tần suất', is_header=True))
-        total = 0
-        for key, val in self.qc_result['keywords'].items():
-            total += len(val)       # Add to total compromise
-            self.grd_report.add_widget(CellItem(description=key.text, frequency=str(len(val))))
-        self.grd_report.add_widget(CellItem(description='TỔNG CỘNG', frequency=str(total),
-                                            is_header=True, is_last=True))
+        self.pnl_result.add_widget(Label(text=self.qc_result[-1]['filename']))
+
+
+class SpeechCheckResult(FloatLayout):
+    pass
 
 
 class SpeechQCApp(App):
-    # mode = 'debug'
-    mode = 'production'
+    mode = 'debug'
+    # mode = 'production'
     icon = os.path.join(common.get_bundle_dir(), 'images', 'anydo_104098.png')
     title = 'Record QC'
 

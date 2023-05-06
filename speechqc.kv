@@ -8,12 +8,12 @@ RootWidget:
     grd_keywords: grd_keywords
     btn_audio: btn_audio
     lbl_file: lbl_file
+    lbl_files: lbl_files
     btn_check: btn_check
     scrl: scrl
     img_load: img_load
-    lbl_transcript: lbl_transcript
-    grd_report: grd_report
     btn_export: btn_export
+    pnl_result: pnl_result
 
     canvas.before:
         Color:
@@ -138,18 +138,38 @@ RootWidget:
                 halign: 'left'
                 valign: 'middle'
                 italic: True
+        HorizontalSeparator:
+            id: sep_grd_files
+            height: dp(4)
+            pos_hint: {'x': sep_right_left.width / self.parent.width, 'top': (self.parent.height - sep_right_top.height - grd_file_chooser.height) / self.parent.height}
+        FloatLayout:
+            id: pnl_files
+            size_hint: None, None
+            height: lbl_files.height
+            width: self.parent.width - sep_right_left.width
+            pos_hint: {'x': sep_right_left.width / self.parent.width, 'top': (self.parent.height - sep_right_top.height - grd_file_chooser.height - sep_grd_files.height) / self.parent.height}
+            Label:
+                id: lbl_files
+                text: ''
+                #size_hint: 1, None
+                size: self.texture_size
+                text_size: self.parent.width, None
+                halign: 'left'
+                color: 0, 0, 0, 1
+                pos_hint: {'center_x': .5, 'center_y': .5}
+
         RoundedButton:
             id: btn_check
             text: 'Check keyword QC'
             radius: common.rounded_radius, common.rounded_radius, common.rounded_radius, common.rounded_radius
             size_hint: .618, None
             height: dp(40)
-            pos_hint: {'center_x': .5, 'top': (self.parent.height - sep_right_top.height - grd_file_chooser.height) / self.parent.height}
+            pos_hint: {'center_x': .5, 'top': (self.parent.height - sep_right_top.height - grd_file_chooser.height - sep_grd_files.height - pnl_files.height) / self.parent.height}
 
         HorizontalSeparator:
             id: sep_btn_check_gif
             height: dp(4) * 2
-            pos_hint: {'x': 0,'top': (self.parent.height - sep_right_top.height - grd_file_chooser.height - btn_check.height) / self.parent.height}
+            pos_hint: {'x': (self.parent.width - sep_right_left.width) / self.parent.width, 'top': (self.parent.height - sep_right_top.height - grd_file_chooser.height - sep_grd_files.height - pnl_files.height - btn_check.height) / self.parent.height}
 
         VerticalSeparator:
             id: sep_btn_check_export
@@ -164,7 +184,7 @@ RootWidget:
             radius: common.rounded_radius, common.rounded_radius, common.rounded_radius, common.rounded_radius
             size_hint: None, None
             size: dp(40), dp(40)
-            pos_hint: {'x': (self.parent.width - (btn_check.width / .618 * .191) + sep_btn_check_export.width) / self.parent.width, 'top': (self.parent.height - sep_right_top.height - grd_file_chooser.height) / self.parent.height}
+            pos_hint: {'x': (self.parent.width - (btn_check.width / .618 * .191) + sep_btn_check_export.width) / self.parent.width, 'top': (self.parent.height - sep_right_top.height - grd_file_chooser.height - sep_grd_files.height - pnl_files.height) / self.parent.height}
 
         FloatLayout:
             canvas.before:
@@ -174,7 +194,7 @@ RootWidget:
                     pos: self.pos
                     size: self.size
             id: pnl_result
-            size_hint: None, (self.parent.height - sep_right_top.height - grd_file_chooser.height - btn_check.height - sep_btn_check_gif.height) / self.parent.height
+            size_hint: None, (self.parent.height - sep_right_top.height - grd_file_chooser.height - sep_grd_files.height - pnl_files.height - btn_check.height - sep_btn_check_gif.height) / self.parent.height
             width: self.parent.width - sep_right_left.width
             pos_hint: {'x': sep_right_left.width / self.parent.width, 'y': 0}
 
@@ -185,7 +205,7 @@ RootWidget:
 
                 FloatLayout:
                     size_hint_y: None
-                    height: lbl_transcript.height + lbl_report.height
+                    height: max(dp(1000), pnl_result.height)
 
                     Image:
                         id: img_load
@@ -195,36 +215,14 @@ RootWidget:
                         pos_hint: {'center_x': .5, 'top': 1}
                         anim_delay: 0
 
-                    Label:
-                        id: lbl_transcript
-                        text: ''
-                        color: 0, 0, 0, 1
+                    GridLayout:
+                        id: pnl_result
                         size_hint: 1, None
-                        pos_hint: {'x': 0, 'top': 1}
-                        text_size: self.parent.width, None
-                        height: min(scrl.height, self.texture_size[1])
-                        halign: 'left'
-                        valign: 'top'
-                        markup: True
+                        pos_hint: {'center_x': .5, 'top': 1}
+                        cols: 1
+                        row_default_height: dp(44)
+                        row_force_default: True
 
-                    HorizontalSeparator:
-                        id: sep_transcript_report
-                        height: dp(4) * 2
-                        pos_hint: {'x': 0, 'top': (self.parent.height - lbl_transcript.height) / self.parent.height}
-
-                    FloatLayout:
-                        id: lbl_report
-                        size_hint: 1, None
-                        height: max(dp(500), grd_report.height)
-                        pos_hint: {'x': 0, 'top': (self.parent.height - lbl_transcript.height - sep_transcript_report.height) / self.parent.height}
-
-                        GridLayout:
-                            id: grd_report
-                            size_hint: .618, None
-                            pos_hint: {'center_x': .5, 'top': 1}
-                            cols: 1
-                            row_default_height: dp(44)
-                            row_force_default: True
 
 
 <KeyWordItem>:
@@ -344,9 +342,9 @@ RootWidget:
         size: root.size
         pos: root.pos
         orientation: "vertical"
-        FileChooserListView:
+        FileChooserIconView:
             id: filechooser
-            filter_dirs: True
+            multiselect: True
 
         BoxLayout:
             size_hint_y: None
